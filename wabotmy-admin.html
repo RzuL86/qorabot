@@ -1,0 +1,1828 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WaBotMY — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --accent: #25D366;
+  --accent2: #128C7E;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --bg: #0a0d0f;
+  --bg2: #111518;
+  --bg3: #181d22;
+  --bg4: #1f262d;
+  --border: #252d35;
+  --border2: #2e3840;
+  --text: #e8edf2;
+  --text2: #8b97a4;
+  --text3: #5a6670;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
+}
+[data-theme="light"] {
+  --bg: #f0f4f8; --bg2: #ffffff; --bg3: #f8fafc; --bg4: #edf2f7;
+  --border: #d1dbe6; --border2: #b8c9d8; --text: #0f1923;
+  --text2: #4a5a6a; --text3: #8a9aaa;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 4px 16px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;transition:background .3s,color .3s;}
+
+/* SVG ICONS */
+.icon{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.icon svg{width:100%;height:100%;}
+
+/* SIDEBAR */
+.sidebar{width:240px;min-height:100vh;background:var(--bg2);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:background .3s,border-color .3s;}
+.sidebar-logo{padding:22px 20px 18px;border-bottom:1px solid var(--border);}
+.logo-mark{display:flex;align-items:center;gap:10px;}
+.logo-icon{width:36px;height:36px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.logo-text{font-family:'Syne',sans-serif;font-weight:800;font-size:16px;letter-spacing:-.3px;}
+.logo-sub{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.5px;margin-top:2px;}
+.sidebar-nav{flex:1;padding:12px;overflow-y:auto;}
+.nav-section-label{font-size:10px;font-weight:600;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;font-family:'DM Mono',monospace;padding:12px 8px 6px;}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--text2);transition:all .15s;margin-bottom:1px;border:none;background:none;width:100%;text-align:left;}
+.nav-item:hover{background:var(--bg3);color:var(--text);}
+.nav-item.active{background:rgba(37,211,102,.12);color:var(--accent);}
+.nav-item.active .nav-icon svg{stroke:var(--accent);}
+.nav-icon{width:18px;height:18px;flex-shrink:0;}
+.nav-icon svg{stroke:var(--text3);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.nav-item.active .nav-icon svg{stroke:var(--accent);}
+.nav-item:hover .nav-icon svg{stroke:var(--text);}
+.nav-badge{margin-left:auto;background:var(--accent);color:#000;font-size:10px;font-weight:700;padding:2px 6px;border-radius:20px;font-family:'DM Mono',monospace;}
+.nav-badge.red{background:var(--danger);color:#fff;}
+.sidebar-footer{padding:12px;border-top:1px solid var(--border);}
+.theme-toggle{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:var(--bg3);border-radius:8px;cursor:pointer;border:1px solid var(--border);}
+.theme-toggle-label{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
+.toggle-pill{width:36px;height:20px;background:var(--border2);border-radius:10px;position:relative;transition:background .3s;}
+.toggle-pill::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:3px;left:3px;transition:transform .3s;}
+[data-theme="light"] .toggle-pill{background:var(--accent);}
+[data-theme="light"] .toggle-pill::after{transform:translateX(16px);}
+
+/* MAIN */
+.main{margin-left:240px;flex:1;display:flex;flex-direction:column;min-height:100vh;}
+.topbar{position:sticky;top:0;z-index:50;background:var(--bg2);border-bottom:1px solid var(--border);padding:14px 28px;display:flex;align-items:center;justify-content:space-between;transition:background .3s;}
+.topbar-title{font-family:'Syne',sans-serif;font-weight:700;font-size:18px;}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.topbar-btn{padding:7px 14px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text);transition:all .15s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:6px;}
+.topbar-btn:hover{border-color:var(--accent);color:var(--accent);}
+.btn-primary{background:var(--accent);color:#000!important;border-color:var(--accent)!important;font-weight:600;}
+.btn-primary:hover{background:#1db954!important;}
+.status-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 3px rgba(37,211,102,.2);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(37,211,102,.2);}50%{box-shadow:0 0 0 6px rgba(37,211,102,.1);}}
+
+/* CONTENT */
+.content{padding:28px;flex:1;}
+.page{display:none;}
+.page.active{display:block;animation:fadeIn .2s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--card-shadow);transition:background .3s,border-color .3s;}
+.stat-label{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;}
+.stat-value{font-family:'Syne',sans-serif;font-size:28px;font-weight:800;line-height:1;margin-bottom:6px;}
+.stat-sub{font-size:12px;color:var(--text3);}
+.stat-card.green .stat-value{color:var(--accent);}
+.stat-card.blue .stat-value{color:var(--info);}
+.stat-card.yellow .stat-value{color:var(--warning);}
+.stat-card.red .stat-value{color:var(--danger);}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;box-shadow:var(--card-shadow);margin-bottom:20px;transition:background .3s,border-color .3s;overflow:hidden;}
+.card-header{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.card-title{font-family:'Syne',sans-serif;font-weight:700;font-size:14px;}
+.card-body{padding:0;}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse;font-size:13.5px;}
+.data-table th{text-align:left;padding:10px 16px;font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;font-family:'DM Mono',monospace;border-bottom:1px solid var(--border);background:var(--bg3);}
+.data-table td{padding:12px 16px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
+.data-table tr:last-child td{border-bottom:none;}
+.data-table tr:hover td{background:var(--bg3);}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:11px;font-weight:600;font-family:'DM Mono',monospace;}
+.badge-green{background:rgba(37,211,102,.12);color:#25D366;border:1px solid rgba(37,211,102,.25);}
+.badge-red{background:rgba(239,68,68,.12);color:#ef4444;border:1px solid rgba(239,68,68,.25);}
+.badge-yellow{background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.25);}
+.badge-blue{background:rgba(59,130,246,.12);color:#3b82f6;border:1px solid rgba(59,130,246,.25);}
+.badge-grey{background:var(--bg3);color:var(--text3);border:1px solid var(--border);}
+
+/* ACTION BUTTONS */
+.action-btn{padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:var(--bg3);color:var(--text2);transition:all .15s;font-family:'DM Sans',sans-serif;margin-right:4px;}
+.action-btn:hover{border-color:var(--accent);color:var(--accent);}
+.action-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* GRID */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.three-col{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+
+/* PLAN CARD */
+.plan-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--card-shadow);transition:all .2s;}
+.plan-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.plan-card.featured{border-color:var(--accent);}
+.plan-name{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px;}
+.plan-price{font-family:'DM Mono',monospace;font-size:24px;font-weight:500;color:var(--accent);margin-bottom:12px;}
+.plan-stat{font-size:12px;color:var(--text3);margin-bottom:4px;}
+.revenue-bar{width:100%;height:6px;background:var(--bg4);border-radius:3px;margin-top:8px;overflow:hidden;}
+.revenue-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width 1s ease;}
+
+/* TOGGLE */
+.toggle-switch{position:relative;width:40px;height:22px;display:inline-block;}
+.toggle-switch input{display:none;}
+.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:11px;cursor:pointer;transition:.3s;}
+.toggle-slider::after{content:'';position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:3px;left:3px;transition:.3s;}
+input:checked+.toggle-slider{background:var(--accent);}
+input:checked+.toggle-slider::after{transform:translateX(18px);}
+
+/* FORM */
+.form-group{margin-bottom:16px;}
+.form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;}
+.form-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13.5px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+.form-input:focus{border-color:var(--accent);}
+select.form-input{cursor:pointer;}
+textarea.form-input{resize:vertical;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;width:500px;max-width:95vw;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.5);animation:modalIn .2s ease;}
+@keyframes modalIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+.modal-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;}
+.modal-close{width:28px;height:28px;border-radius:6px;border:none;background:var(--bg3);color:var(--text2);cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.modal-close:hover{background:var(--danger);color:white;}
+.modal-body{padding:20px 24px;}
+.modal-footer{padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;}
+
+/* SEARCH */
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;padding:7px 12px;transition:border-color .2s;}
+.search-bar:focus-within{border-color:var(--accent);}
+.search-bar input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;width:200px;}
+
+/* TOAST */
+.toast-container{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:13px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 24px rgba(0,0,0,.3);animation:toastIn .3s ease;min-width:240px;}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+.toast.success{border-left:3px solid var(--accent);}
+.toast.error{border-left:3px solid var(--danger);}
+.toast.info{border-left:3px solid var(--info);}
+
+/* LOADING */
+.loading-row td{text-align:center;padding:32px;color:var(--text3);}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:48px 20px;color:var(--text3);}
+.empty-state-icon{width:40px;height:40px;margin:0 auto 12px;opacity:.4;}
+.empty-state-text{font-size:14px;}
+
+/* LOG ENTRY */
+.log-entry{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border);transition:background .15s;}
+.log-entry:hover{background:var(--bg3);}
+.log-entry:last-child{border-bottom:none;}
+.log-time{font-family:'DM Mono',monospace;font-size:11px;color:var(--text3);white-space:nowrap;padding-top:2px;}
+.log-phone{font-family:'DM Mono',monospace;font-size:12px;color:var(--accent);margin-bottom:2px;}
+.log-msg{font-size:13px;color:var(--text2);line-height:1.5;}
+.log-reply{font-size:12px;color:var(--text3);margin-top:4px;font-style:italic;}
+
+/* BOT CARD */
+.bot-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;transition:all .15s;}
+.bot-card:hover{border-color:var(--border2);}
+.bot-card-left{display:flex;align-items:center;gap:14px;}
+.bot-card-avatar{width:40px;height:40px;background:linear-gradient(135deg,var(--accent2),var(--accent));border-radius:10px;display:flex;align-items:center;justify-content:center;}
+.bot-card-name{font-weight:600;font-size:14px;margin-bottom:2px;}
+.bot-card-cat{font-size:12px;color:var(--text3);}
+
+/* AUDIT */
+.audit-item{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);}
+.audit-item:last-child{border-bottom:none;}
+.audit-dot{width:10px;height:10px;border-radius:50%;background:var(--accent);margin-top:5px;flex-shrink:0;}
+.audit-dot.red{background:var(--danger);}
+.audit-dot.blue{background:var(--info);}
+.audit-dot.yellow{background:var(--warning);}
+.audit-action{font-size:13px;font-weight:500;margin-bottom:2px;}
+.audit-meta{font-size:11.5px;color:var(--text3);font-family:'DM Mono',monospace;}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.section-title{font-family:'Syne',sans-serif;font-weight:700;font-size:20px;}
+.section-sub{font-size:13px;color:var(--text3);margin-top:2px;}
+.inline-actions{display:flex;align-items:center;gap:8px;}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* TABS */
+.tab-bar{display:flex;gap:2px;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:20px;border:1px solid var(--border);}
+.tab-btn{flex:1;padding:8px 14px;border-radius:7px;border:none;background:none;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);transition:all .2s;font-family:'DM Sans',sans-serif;white-space:nowrap;}
+.tab-btn.active{background:var(--bg2);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.3);border:1px solid var(--border);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;animation:fadeIn .2s ease;}
+
+/* PRODUCT CARDS */
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;}
+.product-card{background:var(--bg3);border:1px solid var(--border);border-radius:12px;overflow:hidden;transition:all .2s;}
+.product-card:hover{border-color:var(--accent);transform:translateY(-2px);}
+.product-img{width:100%;height:140px;object-fit:cover;background:var(--bg4);display:flex;align-items:center;justify-content:center;}
+.product-img img{width:100%;height:140px;object-fit:cover;display:block;}
+.product-img-placeholder{width:100%;height:140px;background:var(--bg4);display:flex;align-items:center;justify-content:center;color:var(--text3);}
+.product-body{padding:12px 14px 14px;}
+.product-name{font-weight:600;font-size:14px;margin-bottom:4px;}
+.product-desc{font-size:12px;color:var(--text3);margin-bottom:8px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.product-price{font-family:'DM Mono',monospace;font-size:15px;color:var(--accent);font-weight:500;margin-bottom:10px;}
+.product-actions{display:flex;gap:6px;}
+
+/* IMAGE UPLOAD */
+.img-upload-zone{border:2px dashed var(--border2);border-radius:10px;padding:24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg3);}
+.img-upload-zone:hover,.img-upload-zone.drag-over{border-color:var(--accent);background:rgba(37,211,102,.05);}
+.img-upload-zone input[type=file]{display:none;}
+.img-upload-label{font-size:13px;color:var(--text3);cursor:pointer;}
+.img-preview{width:100%;height:120px;object-fit:cover;border-radius:8px;margin-top:10px;display:none;}
+
+/* CLIENT DETAIL MODAL */
+.modal-wide{width:680px;}
+.detail-row{display:flex;gap:8px;margin-bottom:8px;}
+.detail-label{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;width:130px;flex-shrink:0;padding-top:9px;}
+.detail-val{flex:1;}
+
+/* MOBILE SIDEBAR OVERLAY */
+.sidebar-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:99;backdrop-filter:blur(2px);}
+.sidebar-overlay.open{display:block;}
+
+/* HAMBURGER */
+.hamburger{display:none;align-items:center;justify-content:center;width:38px;height:38px;border-radius:8px;border:1px solid var(--border2);background:var(--bg3);cursor:pointer;flex-shrink:0;}
+.hamburger svg{width:18px;height:18px;stroke:var(--text);fill:none;stroke-width:2;stroke-linecap:round;}
+
+/* TABLE SCROLL WRAPPER — applied via JS */
+.table-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+.table-scroll .data-table{min-width:580px;}
+
+/* BOTTOM NAV (mobile) */
+.bottom-nav{display:none;position:fixed;bottom:0;left:0;right:0;z-index:98;background:var(--bg2);border-top:1px solid var(--border);padding:6px 4px calc(6px + env(safe-area-inset-bottom));justify-content:space-around;align-items:center;}
+.bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 8px;border-radius:8px;cursor:pointer;border:none;background:none;color:var(--text3);transition:color .15s;min-width:44px;}
+.bottom-nav-item svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.bottom-nav-item.active{color:var(--accent);}
+.bottom-nav-item span{font-size:9px;font-weight:600;font-family:'DM Mono',monospace;letter-spacing:.2px;}
+
+@media(max-width:1100px){
+  .stats-grid{grid-template-columns:repeat(2,1fr);}
+}
+
+@media(max-width:768px){
+  /* Sidebar slides in from left */
+  .sidebar{transform:translateX(-100%);transition:transform .28s cubic-bezier(.4,0,.2,1);z-index:200;}
+  .sidebar.open{transform:translateX(0);}
+
+  /* Main full width */
+  .main{margin-left:0;}
+
+  /* Topbar */
+  .topbar{padding:10px 14px;gap:8px;}
+  .topbar-title{font-size:15px;}
+  .hamburger{display:flex;}
+  .topbar-btn.btn-hide-mobile{display:none;}
+  #last-sync{font-size:10px;}
+
+  /* Content */
+  .content{padding:14px;padding-bottom:82px;}
+
+  /* Stats */
+  .stats-grid{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+  .stat-card{padding:14px 12px;}
+  .stat-value{font-size:22px;}
+  .stat-sub{font-size:11px;}
+
+  /* Grids */
+  .two-col,.three-col{grid-template-columns:1fr;}
+
+  /* Section headers */
+  .section-header{flex-direction:column;align-items:flex-start;gap:10px;}
+  .inline-actions{width:100%;flex-wrap:wrap;gap:8px;}
+  .search-bar input{width:120px;}
+
+  /* Modals */
+  .modal,.modal-wide{width:95vw;max-height:88vh;border-radius:14px;}
+  .modal-body{padding:14px 16px;}
+  .modal-header{padding:14px 16px 12px;}
+  .modal-footer{padding:12px 16px;gap:8px;}
+  .modal-footer .topbar-btn{flex:1;justify-content:center;}
+
+  /* Tabs */
+  .tab-bar{gap:1px;padding:3px;}
+  .tab-btn{padding:7px 6px;font-size:11px;}
+
+  /* Products grid */
+  .products-grid{grid-template-columns:1fr 1fr;}
+
+  /* Bottom nav */
+  .bottom-nav{display:flex;}
+
+  /* Bot cards */
+  .bot-card{flex-direction:column;align-items:flex-start;gap:10px;}
+  .bot-card > div:last-child{width:100%;justify-content:space-between;}
+
+  /* Topbar action buttons — hide text labels */
+  .topbar-btn-label{display:none;}
+  .topbar-btn{padding:7px 10px;}
+
+  /* Log entries */
+  .log-entry{padding:10px 12px;}
+}
+
+@media(max-width:400px){
+  .products-grid{grid-template-columns:1fr;}
+  .tab-btn{padding:6px 4px;font-size:10px;}
+  .stats-grid{grid-template-columns:1fr 1fr;}
+}
+
+/* Desktop only wide modal */
+@media(min-width:769px){.modal-wide{width:680px;}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" style="position:fixed;inset:0;background:var(--bg);display:flex;align-items:center;justify-content:center;z-index:9999;">
+  <div style="background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:36px 32px;width:340px;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:28px;">
+      <div style="width:36px;height:36px;background:linear-gradient(135deg,#25D366,#128C7E);border-radius:10px;display:flex;align-items:center;justify-content:center;">
+        <svg width="18" height="18" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 15v.01M12 15v.01M16 15v.01"/></svg>
+      </div>
+      <div>
+        <div style="font-family:'Syne',sans-serif;font-weight:800;font-size:16px;">WaBotMY</div>
+        <div style="font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;letter-spacing:.5px;">ADMIN PANEL</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:6px;font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:.5px;">Password</div>
+    <div style="position:relative;margin-bottom:12px;">
+      <input id="login-password" type="password" placeholder="Enter admin password" autocomplete="current-password"
+        style="width:100%;padding:10px 40px 10px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;box-sizing:border-box;">
+      <button onclick="toggleLoginPw()" id="login-eye" type="button"
+        style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;padding:4px;color:var(--text3);display:flex;align-items:center;">
+        <svg id="eye-icon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
+      </button>
+    </div>
+    <div id="login-error" style="display:none;color:var(--danger);font-size:12px;margin-bottom:12px;">Incorrect password.</div>
+    <button id="login-btn" onclick="tryLogin()"
+      style="width:100%;padding:10px;background:#25D366;color:#000;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;">
+      Enter
+    </button>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none;width:100%;min-height:100vh;">
+
+<!-- SIDEBAR OVERLAY (mobile tap to close) -->
+<div class="sidebar-overlay" id="sidebar-overlay" onclick="closeSidebar()"></div>
+
+<!-- SVG SPRITE -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ic-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="ic-store" viewBox="0 0 24 24"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0 2 2 0 0 0 4 0"/><path d="M5 9v11a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9"/><path d="M10 14h4v6h-4z"/></symbol>
+  <symbol id="ic-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></symbol>
+  <symbol id="ic-money" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3H5a2 2 0 0 0-2 2"/><circle cx="12" cy="14" r="2"/><path d="M6 14h.01M18 14h.01"/></symbol>
+  <symbol id="ic-box" viewBox="0 0 24 24"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/><path d="m3.29 7 8.71 5 8.71-5M12 22V12"/></symbol>
+  <symbol id="ic-tag" viewBox="0 0 24 24"><path d="M12 2H2v10l9.29 9.29a1 1 0 0 0 1.41 0l7.29-7.29a1 1 0 0 0 0-1.41Z"/><path d="M7 7h.01"/></symbol>
+  <symbol id="ic-bot" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 15v.01M12 15v.01M16 15v.01"/></symbol>
+  <symbol id="ic-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="ic-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="ic-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></symbol>
+  <symbol id="ic-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="ic-refresh" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></symbol>
+  <symbol id="ic-plus" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+  <symbol id="ic-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></symbol>
+  <symbol id="ic-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></symbol>
+  <symbol id="ic-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="ic-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="ic-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="ic-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="ic-user" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="ic-warn" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="ic-eye" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="ic-eye-off" viewBox="0 0 24 24"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></symbol>
+  <symbol id="ic-package" viewBox="0 0 24 24"><path d="M12 2l9 4.5v9L12 20 3 15.5V6.5L12 2z"/><polyline points="3 6.5 12 11 21 6.5"/><line x1="12" y1="11" x2="12" y2="20"/></symbol>
+  <symbol id="ic-edit" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></symbol>
+  <symbol id="ic-upload" viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></symbol>
+  <symbol id="ic-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></symbol>
+  <symbol id="ic-wa" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></symbol>
+</svg>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark" style="justify-content:space-between;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="logo-icon">
+          <svg width="20" height="20" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-bot"/></svg>
+        </div>
+        <div>
+          <div class="logo-text">WaBotMY</div>
+          <div class="logo-sub">ADMIN PANEL</div>
+        </div>
+      </div>
+      <button onclick="closeSidebar()" id="sidebar-close" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:7px;cursor:pointer;width:30px;height:30px;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">Overview</div>
+    <button class="nav-item active" onclick="showPage('dashboard')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-grid"/></svg></span> Dashboard
+    </button>
+
+    <div class="nav-section-label">Business</div>
+    <button class="nav-item" onclick="showPage('clients')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-store"/></svg></span> Clients
+      <span class="nav-badge" id="badge-clients">—</span>
+    </button>
+    <button class="nav-item" onclick="showPage('subscriptions')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-card"/></svg></span> Subscriptions
+    </button>
+    <button class="nav-item" onclick="showPage('payments')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-money"/></svg></span> Payments
+    </button>
+    <button class="nav-item" onclick="showPage('plans')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-box"/></svg></span> Plans
+    </button>
+    <button class="nav-item" onclick="showPage('promos')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-tag"/></svg></span> Promos
+    </button>
+
+    <div class="nav-section-label">Bot</div>
+    <button class="nav-item" onclick="showPage('products')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-package"/></svg></span> Products
+    </button>
+    <button class="nav-item" onclick="showPage('bot-controls')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-bot"/></svg></span> Bot Controls
+    </button>
+    <button class="nav-item" onclick="showPage('messages')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-msg"/></svg></span> Message Logs
+    </button>
+    <button class="nav-item" onclick="showPage('notifications')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-bell"/></svg></span> Notifications
+    </button>
+
+    <div class="nav-section-label">System</div>
+    <button class="nav-item" onclick="showPage('audit')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-list"/></svg></span> Audit Logs
+    </button>
+    <button class="nav-item" onclick="showPage('settings')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-gear"/></svg></span> Settings
+    </button>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="theme-toggle" onclick="toggleTheme()">
+      <span class="theme-toggle-label" id="theme-label">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><use href="#ic-moon"/></svg>
+        Dark mode
+      </span>
+      <div class="toggle-pill" id="theme-pill"></div>
+    </div>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+  <header class="topbar">
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="hamburger" onclick="openSidebar()" aria-label="Menu">
+        <svg viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <div class="status-dot"></div>
+      <span class="topbar-title" id="page-title">Dashboard</span>
+    </div>
+    <div class="topbar-right">
+      <span style="font-size:12px;color:var(--text3);font-family:'DM Mono',monospace" id="last-sync">—</span>
+      <button class="topbar-btn btn-hide-mobile" onclick="loadAllData()">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-refresh"/></svg>
+        <span class="topbar-btn-label">Refresh</span>
+      </button>
+      <button class="topbar-btn btn-primary btn-hide-mobile" onclick="openModal('modal-add-client')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-plus"/></svg>
+        <span class="topbar-btn-label">Add Client</span>
+      </button>
+      <!-- Mobile: icon-only add button -->
+      <button class="topbar-btn btn-primary" id="topbar-mobile-action" onclick="openModal('modal-add-client')" style="display:none;padding:7px 10px;">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-plus"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="section-header">
+        <div>
+          <div class="section-title">Overview</div>
+          <div class="section-sub">Real-time WaBotMY platform stats</div>
+        </div>
+      </div>
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Active Clients</div>
+          <div class="stat-value" id="stat-clients">—</div>
+          <div class="stat-sub">Registered businesses</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Active Subscriptions</div>
+          <div class="stat-value" id="stat-subs">—</div>
+          <div class="stat-sub">Paying this month</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Messages Today</div>
+          <div class="stat-value" id="stat-msgs">—</div>
+          <div class="stat-sub">Via WhatsApp</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Monthly Revenue</div>
+          <div class="stat-value" id="stat-revenue">—</div>
+          <div class="stat-sub">Confirmed payments</div>
+        </div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Clients</span>
+            <button class="topbar-btn" style="padding:5px 10px;font-size:12px" onclick="showPage('clients')">View all</button>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Business</th><th>Category</th><th>Status</th></tr></thead>
+              <tbody id="dash-clients-tbody"><tr class="loading-row"><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <span class="card-title">Recent Payments</span>
+            <button class="topbar-btn" style="padding:5px 10px;font-size:12px" onclick="showPage('payments')">View all</button>
+          </div>
+          <div class="card-body">
+            <table class="data-table">
+              <thead><tr><th>Client</th><th>Amount</th><th>Status</th></tr></thead>
+              <tbody id="dash-payments-tbody"><tr class="loading-row"><td colspan="3">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Recent Audit Activity</span></div>
+        <div class="card-body" style="padding:16px 20px" id="dash-audit"><div style="color:var(--text3);font-size:13px">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- CLIENTS -->
+    <div class="page" id="page-clients">
+      <div class="section-header">
+        <div><div class="section-title">Clients</div><div class="section-sub">All registered businesses</div></div>
+        <div class="inline-actions">
+          <div class="search-bar">
+            <svg width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
+            <input type="text" placeholder="Search clients..." id="search-clients" oninput="filterClients()">
+          </div>
+          <button class="topbar-btn btn-primary" onclick="openModal('modal-add-client')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-plus"/></svg>
+            Add Client
+          </button>
+        </div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Business</th><th>Category</th><th>Location</th><th>Phone Number ID</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+          <tbody id="clients-tbody"><tr class="loading-row"><td colspan="7">Loading clients...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- SUBSCRIPTIONS -->
+    <div class="page" id="page-subscriptions">
+      <div class="section-header">
+        <div><div class="section-title">Subscriptions</div><div class="section-sub">Client plan subscriptions</div></div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Client ID</th><th>Plan</th><th>Status</th><th>Start Date</th><th>End Date</th><th>Actions</th></tr></thead>
+          <tbody id="subs-tbody"><tr class="loading-row"><td colspan="6">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYMENTS -->
+    <div class="page" id="page-payments">
+      <div class="section-header">
+        <div><div class="section-title">Payments</div><div class="section-sub">Transaction records</div></div>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Client ID</th><th>Amount</th><th>Method</th><th>Status</th><th>Reference</th><th>Date</th></tr></thead>
+          <tbody id="payments-tbody"><tr class="loading-row"><td colspan="6">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PLANS -->
+    <div class="page" id="page-plans">
+      <div class="section-header">
+        <div><div class="section-title">Plans</div><div class="section-sub">Subscription tiers</div></div>
+        <button class="topbar-btn btn-primary" onclick="openModal('modal-add-plan')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-plus"/></svg>
+          Add Plan
+        </button>
+      </div>
+      <div class="three-col" id="plans-grid">
+        <div class="plan-card" style="color:var(--text3)">Loading plans...</div>
+      </div>
+    </div>
+
+    <!-- PROMOS -->
+    <div class="page" id="page-promos">
+      <div class="section-header">
+        <div><div class="section-title">Promos</div><div class="section-sub">Discount codes</div></div>
+        <button class="topbar-btn btn-primary" onclick="openModal('modal-add-promo')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-plus"/></svg>
+          Add Promo
+        </button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Code</th><th>Discount</th><th>Type</th><th>Used</th><th>Max Uses</th><th>Expires</th><th>Status</th><th>Actions</th></tr></thead>
+          <tbody id="promos-tbody"><tr class="loading-row"><td colspan="8">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PRODUCTS -->
+    <div class="page" id="page-products">
+      <div class="section-header">
+        <div><div class="section-title">Products</div><div class="section-sub">Per-client product catalogue</div></div>
+        <div class="inline-actions">
+          <select class="form-input" id="products-client-filter" onchange="loadProducts()" style="width:200px;padding:7px 12px;font-size:13px;">
+            <option value="">All Clients</option>
+          </select>
+          <button class="topbar-btn btn-primary" onclick="openModal('modal-add-product')">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-plus"/></svg>
+            Add Product
+          </button>
+        </div>
+      </div>
+      <div class="products-grid" id="products-grid">
+        <div style="color:var(--text3);font-size:13px;grid-column:1/-1;text-align:center;padding:40px">Loading products...</div>
+      </div>
+    </div>
+
+    <!-- BOT CONTROLS -->
+    <div class="page" id="page-bot-controls">
+      <div class="section-header">
+        <div><div class="section-title">Bot Controls</div><div class="section-sub">Pause or resume bots per client</div></div>
+      </div>
+      <div id="bot-controls-list"><div style="color:var(--text3);font-size:13px">Loading...</div></div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="page" id="page-messages">
+      <div class="section-header">
+        <div><div class="section-title">Message Logs</div><div class="section-sub">All WhatsApp conversations</div></div>
+        <div class="search-bar">
+          <svg width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
+          <input type="text" placeholder="Search by phone...">
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-body" id="messages-list"><div style="padding:32px;text-align:center;color:var(--text3)">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- NOTIFICATIONS -->
+    <div class="page" id="page-notifications">
+      <div class="section-header">
+        <div><div class="section-title">Notifications</div><div class="section-sub">System notifications</div></div>
+        <button class="topbar-btn btn-primary" onclick="openModal('modal-send-notif')">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-send"/></svg>
+          Send Notification
+        </button>
+      </div>
+      <div class="card">
+        <table class="data-table">
+          <thead><tr><th>Client</th><th>Title</th><th>Message</th><th>Type</th><th>Sent</th><th>Read</th></tr></thead>
+          <tbody id="notif-tbody"><tr class="loading-row"><td colspan="6">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- AUDIT LOGS -->
+    <div class="page" id="page-audit">
+      <div class="section-header">
+        <div><div class="section-title">Audit Logs</div><div class="section-sub">All admin and system actions</div></div>
+      </div>
+      <div class="card">
+        <div class="card-body" id="audit-list"><div style="padding:32px;text-align:center;color:var(--text3)">Loading...</div></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="section-header">
+        <div><div class="section-title">Settings</div><div class="section-sub">Platform configuration</div></div>
+      </div>
+      <div class="two-col">
+        <div class="card">
+          <div class="card-header"><span class="card-title">Supabase Connection</span></div>
+          <div class="card-body" style="padding:20px">
+            <div class="form-group">
+              <label class="form-label">Project URL</label>
+              <input class="form-input" type="text" id="sb-url" value="https://zrhgibybyvmkwcxtlyxj.supabase.co">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Service Role Key</label>
+              <input class="form-input" type="password" id="sb-key" placeholder="eyJ...">
+            </div>
+            <button class="topbar-btn btn-primary" onclick="toast('Credentials saved','success')">Save</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><span class="card-title">Change Password</span></div>
+          <div class="card-body" style="padding:20px">
+            <div class="form-group">
+              <label class="form-label">Current Password</label>
+              <div style="position:relative;">
+                <input class="form-input" type="password" id="chpw-current" placeholder="Current password" style="padding-right:38px;">
+                <button type="button" onclick="togglePwField('chpw-current','chpw-eye1')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;">
+                  <svg id="chpw-eye1" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">New Password</label>
+              <div style="position:relative;">
+                <input class="form-input" type="password" id="chpw-new" placeholder="New password" style="padding-right:38px;">
+                <button type="button" onclick="togglePwField('chpw-new','chpw-eye2')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;">
+                  <svg id="chpw-eye2" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Confirm New Password</label>
+              <div style="position:relative;">
+                <input class="form-input" type="password" id="chpw-confirm" placeholder="Confirm new password" style="padding-right:38px;">
+                <button type="button" onclick="togglePwField('chpw-confirm','chpw-eye3')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;">
+                  <svg id="chpw-eye3" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
+                </button>
+              </div>
+            </div>
+            <button class="topbar-btn btn-primary" onclick="changePassword()">Update Password</button>
+            <div id="chpw-msg" style="margin-top:10px;font-size:12px;display:none;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Payment Reminders</span></div>
+        <table class="data-table">
+          <thead><tr><th>Client ID</th><th>Due Date</th><th>Amount</th><th>Status</th><th>Sent At</th></tr></thead>
+          <tbody id="reminders-tbody"><tr class="loading-row"><td colspan="5">Loading...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- MODALS -->
+<div class="modal-overlay" id="modal-add-client">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <span class="modal-title">Add New Client</span>
+      <button class="modal-close" onclick="closeModal('modal-add-client')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin-bottom:12px;padding-bottom:8px;border-bottom:1px solid var(--border)">Business Info</div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Business Name *</label><input class="form-input" type="text" id="new-business-name" placeholder="Kedai Makan ABC"></div>
+        <div class="form-group"><label class="form-label">Category</label><select class="form-input" id="new-category"><option>kedai</option><option>klinik</option><option>salon</option><option>workshop</option><option>restaurant</option><option>property</option><option>other</option></select></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Email *</label><input class="form-input" type="email" id="new-email" placeholder="owner@business.com"></div>
+        <div class="form-group"><label class="form-label">Business Phone</label><input class="form-input" type="text" id="new-phone" placeholder="+601X-XXXXXXX"></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Location</label><input class="form-input" type="text" id="new-location" placeholder="Kuala Lumpur"></div>
+        <div class="form-group"><label class="form-label">Greeting Message</label><input class="form-input" type="text" id="new-greeting" placeholder="Salam! Terima kasih kerana menghubungi kami."></div>
+      </div>
+      <div style="font-size:11px;font-family:'DM Mono',monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;margin:16px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--border)">WhatsApp Credentials</div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Phone Number ID</label><input class="form-input" type="text" id="new-phone-id" placeholder="Meta phone_number_id"></div>
+        <div class="form-group"><label class="form-label">WABA ID</label><input class="form-input" type="text" id="new-waba-id" placeholder="WhatsApp Business Account ID"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Access Token</label><input class="form-input" type="text" id="new-access-token" placeholder="EAAZAl... (Meta permanent token)"></div>
+      <div class="form-group"><label class="form-label">Verify Token</label><input class="form-input" type="text" id="new-verify-token" placeholder="wabotmy2026 (webhook verify token)"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn" onclick="closeModal('modal-add-client')">Cancel</button>
+      <button class="topbar-btn btn-primary" onclick="addClient()">Create Client</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-plan">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Plan</span>
+      <button class="modal-close" onclick="closeModal('modal-add-plan')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Plan Name</label><input class="form-input" type="text" id="new-plan-name" placeholder="Pro"></div>
+        <div class="form-group"><label class="form-label">Price (RM)</label><input class="form-input" type="number" id="new-plan-price" placeholder="199"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Description</label><input class="form-input" type="text" id="new-plan-desc" placeholder="Full AI bot with custom prompt"></div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Max Messages/Month</label><input class="form-input" type="number" id="new-plan-msgs" placeholder="3000"></div>
+        <div class="form-group"><label class="form-label">Duration (days)</label><input class="form-input" type="number" id="new-plan-days" placeholder="30"></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn" onclick="closeModal('modal-add-plan')">Cancel</button>
+      <button class="topbar-btn btn-primary" onclick="addPlan()">Create Plan</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add-promo">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Promo Code</span>
+      <button class="modal-close" onclick="closeModal('modal-add-promo')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Promo Code</label><input class="form-input" type="text" id="new-promo-code" placeholder="LAUNCH50"></div>
+        <div class="form-group"><label class="form-label">Discount Type</label><select class="form-input" id="new-promo-type"><option value="percent">Percentage (%)</option><option value="fixed">Fixed (RM)</option></select></div>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Discount Value</label><input class="form-input" type="number" id="new-promo-value" placeholder="50"></div>
+        <div class="form-group"><label class="form-label">Max Uses</label><input class="form-input" type="number" id="new-promo-max" placeholder="100"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Expiry Date</label><input class="form-input" type="date" id="new-promo-expiry"></div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn" onclick="closeModal('modal-add-promo')">Cancel</button>
+      <button class="topbar-btn btn-primary" onclick="addPromo()">Create Promo</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-send-notif">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Send Notification</span>
+      <button class="modal-close" onclick="closeModal('modal-send-notif')"><svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg></button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group"><label class="form-label">Title</label><input class="form-input" type="text" id="notif-title" placeholder="System Maintenance"></div>
+      <div class="form-group"><label class="form-label">Message</label><textarea class="form-input" id="notif-msg" rows="3" placeholder="Your bot will be paused briefly..."></textarea></div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Type</label><select class="form-input" id="notif-type"><option>info</option><option>warning</option><option>success</option><option>error</option></select></div>
+        <div class="form-group"><label class="form-label">Target</label><select class="form-input" id="notif-target"><option value="all">All Clients</option></select></div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn" onclick="closeModal('modal-send-notif')">Cancel</button>
+      <button class="topbar-btn btn-primary" onclick="sendNotification()">Send</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV (mobile) -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-item active" onclick="showPage('dashboard');closeSidebar()">
+    <svg viewBox="0 0 24 24"><use href="#ic-grid"/></svg>
+    <span>Home</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('clients');closeSidebar()">
+    <svg viewBox="0 0 24 24"><use href="#ic-store"/></svg>
+    <span>Clients</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('products');closeSidebar()">
+    <svg viewBox="0 0 24 24"><use href="#ic-package"/></svg>
+    <span>Products</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('bot-controls');closeSidebar()">
+    <svg viewBox="0 0 24 24"><use href="#ic-bot"/></svg>
+    <span>Bot</span>
+  </button>
+  <button class="bottom-nav-item" onclick="showPage('messages');closeSidebar()">
+    <svg viewBox="0 0 24 24"><use href="#ic-msg"/></svg>
+    <span>Logs</span>
+  </button>
+  <button class="bottom-nav-item" onclick="openSidebar()">
+    <svg viewBox="0 0 24 24"><use href="#ic-gear"/></svg>
+    <span>More</span>
+  </button>
+</nav>
+
+</div><!-- /app -->
+
+<!-- CLIENT DETAIL MODAL -->
+<div class="modal-overlay" id="modal-client-detail">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <span class="modal-title" id="client-detail-title">Client Details</span>
+      <button class="modal-close" onclick="closeModal('modal-client-detail')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" style="padding-top:16px">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchDetailTab('info',this)">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24"><use href="#ic-info"/></svg>Business Info
+        </button>
+        <button class="tab-btn" onclick="switchDetailTab('wa',this)">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24"><use href="#ic-wa"/></svg>WhatsApp
+        </button>
+        <button class="tab-btn" onclick="switchDetailTab('botconfig',this)">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24"><use href="#ic-bot"/></svg>Bot Config
+        </button>
+        <button class="tab-btn" onclick="switchDetailTab('products',this)">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px;margin-right:5px" viewBox="0 0 24 24"><use href="#ic-package"/></svg>Products
+        </button>
+      </div>
+
+      <!-- TAB: Business Info -->
+      <div class="tab-panel active" id="detail-tab-info">
+        <input type="hidden" id="detail-client-id">
+        <div class="two-col">
+          <div class="form-group"><label class="form-label">Business Name</label><input class="form-input" type="text" id="detail-business-name"></div>
+          <div class="form-group"><label class="form-label">Category</label><select class="form-input" id="detail-category"><option>kedai</option><option>klinik</option><option>salon</option><option>workshop</option><option>restaurant</option><option>property</option><option>other</option></select></div>
+        </div>
+        <div class="two-col">
+          <div class="form-group"><label class="form-label">Email</label><input class="form-input" type="email" id="detail-email"></div>
+          <div class="form-group"><label class="form-label">Business Phone</label><input class="form-input" type="text" id="detail-phone-number"></div>
+        </div>
+        <div class="two-col">
+          <div class="form-group"><label class="form-label">Location</label><input class="form-input" type="text" id="detail-location"></div>
+          <div class="form-group"><label class="form-label">Address</label><input class="form-input" type="text" id="detail-address"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Greeting Message</label><input class="form-input" type="text" id="detail-greeting"></div>
+        <div class="two-col">
+          <div class="form-group"><label class="form-label">Open Time</label><input class="form-input" type="time" id="detail-open-time"></div>
+          <div class="form-group"><label class="form-label">Close Time</label><input class="form-input" type="time" id="detail-close-time"></div>
+        </div>
+        <div class="two-col">
+          <div class="form-group"><label class="form-label">Facebook URL</label><input class="form-input" type="text" id="detail-fb" placeholder="https://facebook.com/..."></div>
+          <div class="form-group"><label class="form-label">Instagram URL</label><input class="form-input" type="text" id="detail-ig" placeholder="https://instagram.com/..."></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:4px">
+          <label class="toggle-switch"><input type="checkbox" id="detail-is-active"><span class="toggle-slider"></span></label>
+          <span style="font-size:13px;color:var(--text2)">Active Client</span>
+        </div>
+      </div>
+
+      <!-- TAB: WhatsApp Credentials -->
+      <div class="tab-panel" id="detail-tab-wa">
+        <div class="form-group"><label class="form-label">Phone Number ID</label><input class="form-input" type="text" id="detail-phone-id" placeholder="Meta phone_number_id"></div>
+        <div class="form-group"><label class="form-label">WABA ID</label><input class="form-input" type="text" id="detail-waba-id" placeholder="WhatsApp Business Account ID"></div>
+        <div class="form-group"><label class="form-label">Access Token</label><input class="form-input" type="text" id="detail-access-token" placeholder="EAAZAl... (Meta permanent token)"></div>
+        <div class="form-group"><label class="form-label">Verify Token</label><input class="form-input" type="text" id="detail-verify-token" placeholder="wabotmy2026"></div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;color:var(--text3);line-height:1.6;">
+          <b style="color:var(--text2)">Webhook URL:</b><br>
+          <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--accent)">https://agentmate.oph.st/webhook/54506656-2f5c-41b2-9da3-5ee726ec14eb</span>
+        </div>
+      </div>
+
+      <!-- TAB: Bot Config -->
+      <div class="tab-panel" id="detail-tab-botconfig">
+        <div id="detail-botconfig-content">
+          <div style="color:var(--text3);font-size:13px;padding:20px 0">Loading bot config...</div>
+        </div>
+      </div>
+
+      <!-- TAB: Products (inline, read-only quick view) -->
+      <div class="tab-panel" id="detail-tab-products">
+        <div id="detail-products-content">
+          <div style="color:var(--text3);font-size:13px;padding:20px 0">Loading products...</div>
+        </div>
+        <div style="margin-top:14px">
+          <button class="topbar-btn btn-primary" onclick="openAddProductForClient()">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-plus"/></svg>
+            Add Product
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn" onclick="closeModal('modal-client-detail')">Close</button>
+      <button class="topbar-btn btn-primary" onclick="saveClientDetail()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD PRODUCT MODAL -->
+<div class="modal-overlay" id="modal-add-product">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Add Product</span>
+      <button class="modal-close" onclick="closeModal('modal-add-product')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <input type="hidden" id="new-product-client-id">
+      <div class="form-group">
+        <label class="form-label">Client *</label>
+        <select class="form-input" id="new-product-client-select"></select>
+      </div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Product Name *</label><input class="form-input" type="text" id="new-product-name" placeholder="Nasi Lemak Special"></div>
+        <div class="form-group"><label class="form-label">Price (RM)</label><input class="form-input" type="number" step="0.01" id="new-product-price" placeholder="12.90"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-input" id="new-product-desc" rows="2" placeholder="Brief product description..."></textarea></div>
+      <div class="two-col">
+        <div class="form-group"><label class="form-label">Category</label><input class="form-input" type="text" id="new-product-category" placeholder="Makanan / Minuman"></div>
+        <div class="form-group" style="display:flex;align-items:center;gap:20px;padding-top:24px">
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2)">
+            <label class="toggle-switch"><input type="checkbox" id="new-product-available" checked><span class="toggle-slider"></span></label>
+            Available
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2)">
+            <label class="toggle-switch"><input type="checkbox" id="new-product-featured"><span class="toggle-slider"></span></label>
+            Featured
+          </label>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Product Image</label>
+        <div class="img-upload-zone" id="img-upload-zone" onclick="document.getElementById('new-product-img-input').click()" ondragover="handleDragOver(event)" ondrop="handleDrop(event)">
+          <input type="file" id="new-product-img-input" accept="image/*" onchange="handleImageSelect(event)">
+          <svg width="28" height="28" fill="none" stroke="var(--text3)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" style="margin-bottom:8px"><use href="#ic-upload"/></svg>
+          <div class="img-upload-label">Click to upload or drag & drop<br><span style="font-size:11px">PNG, JPG up to 2MB</span></div>
+          <img id="img-preview" class="img-preview" alt="Preview">
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="topbar-btn" onclick="closeModal('modal-add-product')">Cancel</button>
+      <button class="topbar-btn btn-primary" onclick="addProduct()">Add Product</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const SUPABASE_URL = 'https://zrhgibybyvmkwcxtlyxj.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyaGdpYnlidm1rd2N4dGx5eGoiLCJyb2xlIjoic2VydmljZV9yb2xlIiwiaWF0IjoxNzQ4NzY1OTk4LCJleHAiOjIwNjQzNDE5OTh9.DpjJUht4kF7TORT3TYEsowWIAMqp6TQDi9efXa60tpY';
+
+// PASSWORD — change ADMIN_PASSWORD to whatever you want
+const ADMIN_PASSWORD = 'Fahmi313!';
+
+let currentPassHash = '';
+
+async function sha256(str) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+async function tryLogin() {
+  const pw = document.getElementById('login-password').value;
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-error');
+  if (!pw) return;
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+  const hash = await sha256(pw);
+  if (hash !== currentPassHash) {
+    err.style.display = 'block';
+    btn.disabled = false;
+    btn.textContent = 'Enter';
+    document.getElementById('login-password').value = '';
+    return;
+  }
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  loadAllData();
+}
+
+function toggleLoginPw() {
+  const inp = document.getElementById('login-password');
+  const icon = document.getElementById('eye-icon');
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  icon.querySelector('use').setAttribute('href', show ? '#ic-eye-off' : '#ic-eye');
+}
+
+function togglePwField(inputId, iconId) {
+  const inp = document.getElementById(inputId);
+  const icon = document.getElementById(iconId);
+  const show = inp.type === 'password';
+  inp.type = show ? 'text' : 'password';
+  icon.querySelector('use').setAttribute('href', show ? '#ic-eye-off' : '#ic-eye');
+}
+
+async function changePassword() {
+  const cur = document.getElementById('chpw-current').value;
+  const nw = document.getElementById('chpw-new').value;
+  const conf = document.getElementById('chpw-confirm').value;
+  if (!cur || !nw || !conf) { showPwMsg('All fields required.', 'error'); return; }
+  if (nw !== conf) { showPwMsg('New passwords do not match.', 'error'); return; }
+  if (nw.length < 6) { showPwMsg('Minimum 6 characters.', 'error'); return; }
+  const curHash = await sha256(cur);
+  if (curHash !== currentPassHash) { showPwMsg('Current password incorrect.', 'error'); return; }
+  currentPassHash = await sha256(nw);
+  localStorage.setItem('wabotmy_pw_hash', currentPassHash);
+  ['chpw-current','chpw-new','chpw-confirm'].forEach(id => document.getElementById(id).value = '');
+  showPwMsg('Password updated successfully.', 'success');
+}
+
+function showPwMsg(text, type) {
+  const el = document.getElementById('chpw-msg');
+  el.textContent = text;
+  el.style.display = 'block';
+  el.style.color = type === 'error' ? 'var(--danger)' : 'var(--accent)';
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const stored = localStorage.getItem('wabotmy_pw_hash');
+  currentPassHash = stored || await sha256(ADMIN_PASSWORD);
+  document.getElementById('login-password').addEventListener('keydown', e => {
+    if (e.key === 'Enter') tryLogin();
+  });
+  // Show mobile topbar add btn on narrow screens
+  const mobileBtn = document.getElementById('topbar-mobile-action');
+  function checkMobile(){
+    if(mobileBtn) mobileBtn.style.display = window.innerWidth<=768 ? '' : 'none';
+  }
+  checkMobile();
+  window.addEventListener('resize', checkMobile);
+});
+
+async function sb(table, opts={}) {
+  let url = `${SUPABASE_URL}/rest/v1/${table}`;
+  const p = new URLSearchParams();
+  if(opts.select) p.set('select', opts.select);
+  if(opts.limit) p.set('limit', opts.limit);
+  if(opts.order) p.set('order', opts.order);
+  if(opts.filter) Object.entries(opts.filter).forEach(([k,v])=>p.set(k,v));
+  if([...p].length) url += '?' + p.toString();
+  const r = await fetch(url,{
+    method: opts.method||'GET',
+    headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json','Prefer': opts.method==='POST'?'return=representation':'return=minimal'},
+    body: opts.body?JSON.stringify(opts.body):undefined
+  });
+  if(!r.ok){const e=await r.json().catch(()=>({}));throw new Error(e.message||r.statusText);}
+  return (opts.method&&opts.method!=='GET')?r:r.json();
+}
+
+async function sbPatch(table,id,body){
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`,{method:'PATCH',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(!r.ok) throw new Error('Update failed');
+}
+
+async function sbDelete(table,id){
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/${table}?id=eq.${id}`,{method:'DELETE',headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}});
+  if(!r.ok) throw new Error('Delete failed');
+}
+
+// SIDEBAR MOBILE
+function openSidebar(){
+  document.getElementById('sidebar-close').style.display='flex';
+  document.querySelector('.sidebar').classList.add('open');
+  document.getElementById('sidebar-overlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSidebar(){
+  document.querySelector('.sidebar').classList.remove('open');
+  document.getElementById('sidebar-overlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// NAV
+function showPage(page){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  const navBtn=document.querySelector(`.nav-item[onclick="showPage('${page}')"]`);
+  if(navBtn)navBtn.classList.add('active');
+  const titles={dashboard:'Dashboard',clients:'Clients',subscriptions:'Subscriptions',payments:'Payments',plans:'Plans',promos:'Promos',products:'Products','bot-controls':'Bot Controls',messages:'Message Logs',notifications:'Notifications',audit:'Audit Logs',settings:'Settings'};
+  document.getElementById('page-title').textContent=titles[page]||page;
+  // Sync bottom nav
+  document.querySelectorAll('.bottom-nav-item').forEach(b=>b.classList.remove('active'));
+  const bnMap={dashboard:0,clients:1,products:2,'bot-controls':3,messages:4};
+  const bnItems=document.querySelectorAll('.bottom-nav-item');
+  if(bnMap[page]!==undefined)bnItems[bnMap[page]]?.classList.add('active');
+  // Mobile topbar action button context
+  const mobileBtn=document.getElementById('topbar-mobile-action');
+  if(mobileBtn){
+    if(page==='clients'){mobileBtn.style.display='';mobileBtn.onclick=()=>openModal('modal-add-client');}
+    else if(page==='products'){mobileBtn.style.display='';mobileBtn.onclick=()=>openModal('modal-add-product');}
+    else{mobileBtn.style.display='none';}
+  }
+  // Wrap tables in scroll divs if not already
+  setTimeout(()=>{
+    document.querySelectorAll('#page-'+page+' .card').forEach(card=>{
+      const tbl=card.querySelector('.data-table');
+      if(tbl&&!tbl.parentElement.classList.contains('table-scroll')){
+        const wrap=document.createElement('div');wrap.className='table-scroll';
+        tbl.parentNode.insertBefore(wrap,tbl);wrap.appendChild(tbl);
+      }
+    });
+  },50);
+  closeSidebar();
+}
+
+// THEME
+function toggleTheme(){
+  const html=document.documentElement;
+  const dark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',dark?'light':'dark');
+  const lbl=document.getElementById('theme-label');
+  lbl.innerHTML=dark
+    ?'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><use href="#ic-sun"/></svg> Light mode'
+    :'<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><use href="#ic-moon"/></svg> Dark mode';
+}
+
+// TOAST
+function toast(msg,type='success'){
+  const el=document.createElement('div');
+  el.className=`toast ${type}`;
+  const icons={success:'#ic-check',error:'#ic-x',info:'#ic-warn'};
+  const colors={success:'var(--accent)',error:'var(--danger)',info:'var(--info)'};
+  el.innerHTML=`<svg width="16" height="16" fill="none" stroke="${colors[type]||colors.info}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="${icons[type]||icons.info}"/></svg><span>${msg}</span>`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(()=>el.remove(),3500);
+}
+
+// MODAL
+function openModal(id){document.getElementById(id).classList.add('open');}
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
+
+// FORMATTERS
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'numeric'});}
+function fmtDT(d){if(!d)return'—';return new Date(d).toLocaleString('en-MY',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}
+function statusBadge(a,t='Active',f='Inactive'){return a?`<span class="badge badge-green">${t}</span>`:`<span class="badge badge-red">${f}</span>`;}
+function shortId(id){return id?id.substring(0,8)+'...':'—';}
+
+// CLIENT DETAIL MODAL
+let detailClientId = null;
+
+function openClientDetail(c) {
+  detailClientId = c.id;
+  document.getElementById('client-detail-title').textContent = c.business_name;
+  document.getElementById('detail-client-id').value = c.id;
+  document.getElementById('detail-business-name').value = c.business_name||'';
+  document.getElementById('detail-category').value = c.category||'kedai';
+  document.getElementById('detail-email').value = c.email||'';
+  document.getElementById('detail-phone-number').value = c.phone_number||'';
+  document.getElementById('detail-location').value = c.location||'';
+  document.getElementById('detail-address').value = c.address||'';
+  document.getElementById('detail-greeting').value = c.greeting_message||'';
+  document.getElementById('detail-open-time').value = c.open_time||'09:00';
+  document.getElementById('detail-close-time').value = c.close_time||'18:00';
+  document.getElementById('detail-fb').value = c.facebook_url||'';
+  document.getElementById('detail-ig').value = c.instagram_url||'';
+  document.getElementById('detail-is-active').checked = c.is_active !== false;
+  document.getElementById('detail-phone-id').value = c.phone_number_id||'';
+  document.getElementById('detail-waba-id').value = c.waba_id||'';
+  document.getElementById('detail-access-token').value = c.access_token||'';
+  document.getElementById('detail-verify-token').value = c.verify_token||'';
+  // Reset to first tab
+  switchDetailTab('info', document.querySelector('#modal-client-detail .tab-btn'));
+  loadDetailBotConfig(c.id);
+  loadDetailProducts(c.id);
+  openModal('modal-client-detail');
+}
+
+function switchDetailTab(tab, btn) {
+  document.querySelectorAll('#modal-client-detail .tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('#modal-client-detail .tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('detail-tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+async function loadDetailBotConfig(clientId) {
+  const el = document.getElementById('detail-botconfig-content');
+  try {
+    const data = await sb('bot_config', {select:'*', filter:{client_id: 'eq.'+clientId}});
+    const cfg = data[0] || {};
+    el.innerHTML = `
+      <div class="form-group"><label class="form-label">System Prompt</label>
+        <textarea class="form-input" id="detail-system-prompt" rows="6" placeholder="You are a professional assistant for this business...">${cfg.system_prompt||''}</textarea>
+      </div>
+      <div class="form-group"><label class="form-label">Language</label>
+        <select class="form-input" id="detail-bot-language">
+          <option value="auto" ${cfg.language==='auto'?'selected':''}>Auto-detect</option>
+          <option value="en" ${cfg.language==='en'?'selected':''}>English only</option>
+          <option value="ms" ${cfg.language==='ms'?'selected':''}>Bahasa Malaysia only</option>
+        </select>
+      </div>`;
+    el.dataset.configId = cfg.id || '';
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--danger);font-size:13px">Error loading config: ${e.message}</div>`;
+  }
+}
+
+async function loadDetailProducts(clientId) {
+  const el = document.getElementById('detail-products-content');
+  try {
+    const data = await sb('products', {select:'*', filter:{client_id:'eq.'+clientId}, order:'created_at.desc'});
+    if (!data.length) { el.innerHTML = '<div style="color:var(--text3);font-size:13px;padding:16px 0">No products yet.</div>'; return; }
+    el.innerHTML = `<div class="products-grid">${data.map(p=>`
+      <div class="product-card">
+        ${p.image_url?`<img src="${p.image_url}" style="width:100%;height:100px;object-fit:cover;display:block;">`:`<div class="product-img-placeholder" style="height:100px"><svg width="28" height="28" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-package"/></svg></div>`}
+        <div class="product-body">
+          <div class="product-name">${p.name}</div>
+          ${p.price?`<div class="product-price">RM ${parseFloat(p.price).toFixed(2)}</div>`:''}
+          <div style="display:flex;gap:6px">
+            ${p.is_available?'<span class="badge badge-green">Available</span>':'<span class="badge badge-red">Unavailable</span>'}
+            ${p.is_featured?'<span class="badge badge-yellow">Featured</span>':''}
+          </div>
+        </div>
+      </div>`).join('')}</div>`;
+  } catch(e) {
+    el.innerHTML = `<div style="color:var(--danger);font-size:13px">Error: ${e.message}</div>`;
+  }
+}
+
+async function saveClientDetail() {
+  const id = document.getElementById('detail-client-id').value;
+  const body = {
+    business_name: document.getElementById('detail-business-name').value,
+    category: document.getElementById('detail-category').value,
+    email: document.getElementById('detail-email').value,
+    phone_number: document.getElementById('detail-phone-number').value||null,
+    location: document.getElementById('detail-location').value||null,
+    address: document.getElementById('detail-address').value||null,
+    greeting_message: document.getElementById('detail-greeting').value||null,
+    open_time: document.getElementById('detail-open-time').value||null,
+    close_time: document.getElementById('detail-close-time').value||null,
+    facebook_url: document.getElementById('detail-fb').value||null,
+    instagram_url: document.getElementById('detail-ig').value||null,
+    is_active: document.getElementById('detail-is-active').checked,
+    phone_number_id: document.getElementById('detail-phone-id').value||null,
+    waba_id: document.getElementById('detail-waba-id').value||null,
+    access_token: document.getElementById('detail-access-token').value||null,
+    verify_token: document.getElementById('detail-verify-token').value||null,
+  };
+  try {
+    await sbPatch('clients', id, body);
+    // Save bot config if loaded
+    const promptEl = document.getElementById('detail-system-prompt');
+    if (promptEl) {
+      const cfgId = document.getElementById('detail-botconfig-content').dataset.configId;
+      const cfgBody = {system_prompt: promptEl.value, language: document.getElementById('detail-bot-language').value, client_id: id};
+      if (cfgId) { await sbPatch('bot_config', cfgId, cfgBody); }
+      else { await sb('bot_config', {method:'POST', body: cfgBody}); }
+    }
+    toast('Client saved', 'success');
+    loadClients();
+  } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+}
+
+function openAddProductForClient() {
+  document.getElementById('new-product-client-id').value = detailClientId || '';
+  const sel = document.getElementById('new-product-client-select');
+  if (detailClientId) {
+    const c = allClients.find(x => x.id === detailClientId);
+    sel.innerHTML = `<option value="${detailClientId}">${c ? c.business_name : detailClientId}</option>`;
+    sel.disabled = true;
+  }
+  openModal('modal-add-product');
+}
+
+// PRODUCTS PAGE
+async function loadProducts() {
+  const clientFilter = document.getElementById('products-client-filter')?.value;
+  // Populate client filter dropdown if empty
+  const sel = document.getElementById('products-client-filter');
+  if (sel && sel.options.length <= 1 && allClients.length) {
+    allClients.forEach(c => {
+      const o = document.createElement('option');
+      o.value = c.id; o.textContent = c.business_name;
+      sel.appendChild(o);
+    });
+  }
+  // Also populate Add Product client select
+  const addSel = document.getElementById('new-product-client-select');
+  if (addSel && !addSel.disabled) {
+    addSel.innerHTML = allClients.map(c=>`<option value="${c.id}">${c.business_name}</option>`).join('');
+  }
+  const grid = document.getElementById('products-grid');
+  try {
+    const opts = {select:'*', order:'created_at.desc'};
+    if (clientFilter) opts.filter = {client_id: 'eq.'+clientFilter};
+    const data = await sb('products', opts);
+    if (!data.length) {
+      grid.innerHTML = '<div style="color:var(--text3);font-size:14px;grid-column:1/-1;text-align:center;padding:48px">No products yet. Add your first product!</div>';
+      return;
+    }
+    grid.innerHTML = data.map(p => {
+      const client = allClients.find(c => c.id === p.client_id);
+      return `<div class="product-card">
+        ${p.image_url
+          ? `<img src="${p.image_url}" style="width:100%;height:140px;object-fit:cover;display:block;">`
+          : `<div class="product-img-placeholder"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-package"/></svg></div>`}
+        <div class="product-body">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'DM Mono',monospace">${client?client.business_name:shortId(p.client_id)}</div>
+          <div class="product-name">${p.name}</div>
+          ${p.description?`<div class="product-desc">${p.description}</div>`:''}
+          ${p.price?`<div class="product-price">RM ${parseFloat(p.price).toFixed(2)}</div>`:''}
+          <div style="display:flex;gap:6px;margin-bottom:10px">
+            ${p.is_available?'<span class="badge badge-green">Available</span>':'<span class="badge badge-red">Unavailable</span>'}
+            ${p.is_featured?'<span class="badge badge-yellow">Featured</span>':''}
+          </div>
+          <div class="product-actions">
+            <button class="action-btn" onclick="toggleProductAvail('${p.id}',${p.is_available})">${p.is_available?'Disable':'Enable'}</button>
+            <button class="action-btn danger" onclick="deleteProduct('${p.id}')">Delete</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    grid.innerHTML = `<div style="color:var(--danger);grid-column:1/-1;padding:24px">Error: ${e.message}</div>`;
+  }
+}
+
+async function addProduct() {
+  const clientId = document.getElementById('new-product-client-select').value || document.getElementById('new-product-client-id').value;
+  if (!clientId) { toast('Select a client', 'error'); return; }
+  const name = document.getElementById('new-product-name').value;
+  if (!name) { toast('Product name required', 'error'); return; }
+  let imageUrl = null;
+  const file = document.getElementById('new-product-img-input').files[0];
+  if (file) {
+    try { imageUrl = await uploadProductImage(file, clientId); } catch(e) { toast('Image upload failed: '+e.message, 'error'); return; }
+  }
+  const body = {
+    client_id: clientId,
+    name,
+    description: document.getElementById('new-product-desc').value||null,
+    price: document.getElementById('new-product-price').value||null,
+    category: document.getElementById('new-product-category').value||null,
+    is_available: document.getElementById('new-product-available').checked,
+    is_featured: document.getElementById('new-product-featured').checked,
+    image_url: imageUrl
+  };
+  try {
+    await sb('products', {method:'POST', body});
+    toast('Product added', 'success');
+    closeModal('modal-add-product');
+    // Reset form
+    ['new-product-name','new-product-price','new-product-desc','new-product-category'].forEach(id => document.getElementById(id).value='');
+    document.getElementById('img-preview').style.display='none';
+    document.getElementById('new-product-img-input').value='';
+    document.getElementById('new-product-client-select').disabled = false;
+    if (detailClientId) loadDetailProducts(detailClientId);
+    loadProducts();
+  } catch(e) { toast('Failed: '+e.message, 'error'); }
+}
+
+async function uploadProductImage(file, clientId) {
+  const SUPABASE_URL_CLEAN = SUPABASE_URL;
+  const path = `${clientId}/${Date.now()}-${file.name.replace(/[^a-z0-9.]/gi,'_')}`;
+  const r = await fetch(`${SUPABASE_URL_CLEAN}/storage/v1/object/product-images/${path}`, {
+    method: 'POST',
+    headers: {'apikey': SUPABASE_KEY, 'Authorization': 'Bearer '+SUPABASE_KEY, 'Content-Type': file.type, 'x-upsert': 'true'},
+    body: file
+  });
+  if (!r.ok) { const e = await r.json().catch(()=>({})); throw new Error(e.error||'Upload failed'); }
+  return `${SUPABASE_URL_CLEAN}/storage/v1/object/public/product-images/${path}`;
+}
+
+async function toggleProductAvail(id, cur) {
+  try { await sbPatch('products', id, {is_available: !cur}); toast(`Product ${!cur?'enabled':'disabled'}`, 'success'); loadProducts(); } catch(e) { toast('Failed: '+e.message,'error'); }
+}
+
+async function deleteProduct(id) {
+  if (!confirm('Delete this product?')) return;
+  try { await sbDelete('products', id); toast('Deleted', 'success'); loadProducts(); } catch(e) { toast('Failed: '+e.message,'error'); }
+}
+
+// IMAGE UPLOAD HELPERS
+function handleDragOver(e) { e.preventDefault(); document.getElementById('img-upload-zone').classList.add('drag-over'); }
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('img-upload-zone').classList.remove('drag-over');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) previewImage(file);
+}
+function handleImageSelect(e) { const file = e.target.files[0]; if (file) previewImage(file); }
+function previewImage(file) {
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const img = document.getElementById('img-preview');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+// LOAD ALL
+async function loadAllData(){
+  document.getElementById('last-sync').textContent='Syncing...';
+  await Promise.allSettled([loadDashboard(),loadClients(),loadSubscriptions(),loadPayments(),loadPlans(),loadPromos(),loadBotControls(),loadMessages(),loadNotifications(),loadAuditLogs(),loadSettings()]);
+  document.getElementById('last-sync').textContent='Synced '+new Date().toLocaleTimeString('en-MY');
+}
+
+// DASHBOARD
+async function loadDashboard(){
+  try{
+    const [clients,subs,payments]=await Promise.all([
+      sb('clients',{select:'id,business_name,category,is_active,created_at',order:'created_at.desc',limit:5}),
+      sb('subscriptions',{select:'id,status'}),
+      sb('payments',{select:'id,amount,status,client_id,payment_method,created_at',order:'created_at.desc',limit:5})
+    ]);
+    let msgs=[];
+    try{msgs=await sb('message_logs',{select:'id',filter:{created_at:`gte.${new Date().toISOString().split('T')[0]}`}});}catch(e){}
+
+    document.getElementById('stat-clients').textContent=clients.filter(c=>c.is_active).length;
+    document.getElementById('stat-subs').textContent=subs.filter(s=>s.status==='active').length;
+    document.getElementById('stat-msgs').textContent=msgs.length;
+    document.getElementById('badge-clients').textContent=clients.length;
+
+    const rev=payments.filter(p=>p.status==='paid').reduce((s,p)=>s+(p.amount||0),0);
+    document.getElementById('stat-revenue').textContent='RM '+rev.toFixed(0);
+
+    document.getElementById('dash-clients-tbody').innerHTML=clients.length?clients.map(c=>`<tr><td><b>${c.business_name}</b></td><td><span class="badge badge-blue">${c.category||'—'}</span></td><td>${statusBadge(c.is_active)}</td></tr>`).join(''):'<tr class="loading-row"><td colspan="3">No clients yet</td></tr>';
+    document.getElementById('dash-payments-tbody').innerHTML=payments.length?payments.map(p=>`<tr><td style="font-family:'DM Mono',monospace;font-size:11px">${shortId(p.client_id)}</td><td><b>RM ${(p.amount||0).toFixed(2)}</b></td><td>${p.status==='paid'?'<span class="badge badge-green">PAID</span>':p.status==='pending'?'<span class="badge badge-yellow">PENDING</span>':'<span class="badge badge-grey">'+(p.status||'—')+'</span>'}</td></tr>`).join(''):'<tr class="loading-row"><td colspan="3">No payments yet</td></tr>';
+
+    let audit=[];
+    try{audit=await sb('audit_logs',{select:'*',order:'created_at.desc',limit:5});}catch(e){}
+    document.getElementById('dash-audit').innerHTML=audit.length?audit.map(a=>`<div class="audit-item"><div class="audit-dot ${a.action_type==='delete'?'red':a.action_type==='update'?'blue':''}"></div><div><div class="audit-action">${a.action||a.action_type||'Action'}</div><div class="audit-meta">${fmtDT(a.created_at)} &middot; ${a.admin_id||'System'}</div></div></div>`).join(''):'<div style="color:var(--text3);font-size:13px">No recent activity</div>';
+  }catch(e){console.error('Dashboard error:',e);}
+}
+
+// CLIENTS
+let allClients=[];
+async function loadClients(){
+  try{
+    allClients=await sb('clients',{select:'*',order:'created_at.desc'});
+    renderClients(allClients);
+    loadProducts();
+  }catch(e){document.getElementById('clients-tbody').innerHTML=`<tr class="loading-row"><td colspan="7" style="color:var(--danger)">Error: ${e.message}</td></tr>`;}
+}
+
+function renderClients(data){
+  const tbody=document.getElementById('clients-tbody');
+  tbody.innerHTML=data.length?data.map(c=>`<tr>
+    <td><div style="font-weight:600">${c.business_name}</div><div style="font-size:11px;color:var(--text3)">${c.email||'—'}</div></td>
+    <td><span class="badge badge-blue">${c.category||'—'}</span></td>
+    <td>${c.location||'—'}</td>
+    <td style="font-family:'DM Mono',monospace;font-size:11px">${c.phone_number_id?c.phone_number_id.substring(0,14)+'...':'—'}</td>
+    <td>${statusBadge(c.is_active)}</td>
+    <td style="color:var(--text3);font-size:12px">${fmtDate(c.created_at)}</td>
+    <td>
+      <button class="action-btn" onclick='openClientDetail(${JSON.stringify(c)})'>Details</button>
+      <button class="action-btn" onclick="toggleClient('${c.id}',${c.is_active})">${c.is_active?'Suspend':'Activate'}</button>
+      <button class="action-btn danger" onclick="deleteClient('${c.id}')">Delete</button>
+    </td>
+  </tr>`).join(''):'<tr class="loading-row"><td colspan="7">No clients yet. Add your first client!</td></tr>';
+}
+
+function filterClients(){
+  const q=document.getElementById('search-clients').value.toLowerCase();
+  renderClients(allClients.filter(c=>c.business_name?.toLowerCase().includes(q)||c.email?.toLowerCase().includes(q)||c.category?.toLowerCase().includes(q)));
+}
+
+async function toggleClient(id,cur){
+  try{await sbPatch('clients',id,{is_active:!cur});toast(`Client ${!cur?'activated':'suspended'}`,'success');loadClients();loadDashboard();}catch(e){toast('Failed: '+e.message,'error');}
+}
+
+async function deleteClient(id){
+  if(!confirm('Delete this client? This cannot be undone.'))return;
+  try{await sbDelete('clients',id);toast('Client deleted','success');loadClients();loadDashboard();}catch(e){toast('Delete failed: '+e.message,'error');}
+}
+
+async function addClient(){
+  const body={
+    business_name:document.getElementById('new-business-name').value,
+    category:document.getElementById('new-category').value,
+    email:document.getElementById('new-email').value,
+    phone_number_id:document.getElementById('new-phone-id').value||null,
+    waba_id:document.getElementById('new-waba-id').value||null,
+    access_token:document.getElementById('new-access-token').value||null,
+    verify_token:document.getElementById('new-verify-token').value||null,
+    location:document.getElementById('new-location').value||null,
+    phone_number:document.getElementById('new-phone').value||null,
+    greeting_message:document.getElementById('new-greeting').value||null,
+    is_active:true
+  };
+  if(!body.business_name||!body.email){toast('Business name & email required','error');return;}
+  try{await sb('clients',{method:'POST',body});toast('Client created','success');closeModal('modal-add-client');loadClients();loadDashboard();}catch(e){toast('Failed: '+e.message,'error');}
+}
+
+// SUBSCRIPTIONS
+async function loadSubscriptions(){
+  try{
+    const data=await sb('subscriptions',{select:'*',order:'created_at.desc'});
+    document.getElementById('subs-tbody').innerHTML=data.length?data.map(s=>`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${shortId(s.client_id)}</td>
+      <td><span class="badge badge-blue">${s.plan_id?shortId(s.plan_id):'—'}</span></td>
+      <td>${s.status==='active'?'<span class="badge badge-green">ACTIVE</span>':s.status==='expired'?'<span class="badge badge-red">EXPIRED</span>':'<span class="badge badge-yellow">'+(s.status||'—').toUpperCase()+'</span>'}</td>
+      <td style="color:var(--text3);font-size:12px">${fmtDate(s.start_date)}</td>
+      <td style="color:var(--text3);font-size:12px">${fmtDate(s.end_date)}</td>
+      <td><button class="action-btn" onclick="renewSub('${s.id}')">Renew</button><button class="action-btn danger" onclick="cancelSub('${s.id}')">Cancel</button></td>
+    </tr>`).join(''):'<tr class="loading-row"><td colspan="6">No subscriptions yet</td></tr>';
+  }catch(e){document.getElementById('subs-tbody').innerHTML=`<tr class="loading-row"><td colspan="6" style="color:var(--danger)">Error: ${e.message}</td></tr>`;}
+}
+
+async function renewSub(id){try{const e=new Date();e.setMonth(e.getMonth()+1);await sbPatch('subscriptions',id,{status:'active',end_date:e.toISOString()});toast('Renewed 30 days','success');loadSubscriptions();}catch(e){toast('Failed: '+e.message,'error');}}
+async function cancelSub(id){try{await sbPatch('subscriptions',id,{status:'cancelled'});toast('Cancelled','success');loadSubscriptions();}catch(e){toast('Failed: '+e.message,'error');}}
+
+// PAYMENTS
+async function loadPayments(){
+  try{
+    const data=await sb('payments',{select:'*',order:'created_at.desc'});
+    document.getElementById('payments-tbody').innerHTML=data.length?data.map(p=>`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${shortId(p.client_id)}</td>
+      <td><b>RM ${(p.amount||0).toFixed(2)}</b></td>
+      <td>${p.payment_method||'—'}</td>
+      <td>${p.status==='paid'?'<span class="badge badge-green">PAID</span>':p.status==='pending'?'<span class="badge badge-yellow">PENDING</span>':'<span class="badge badge-red">'+(p.status||'—').toUpperCase()+'</span>'}</td>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${p.reference||'—'}</td>
+      <td style="color:var(--text3);font-size:12px">${fmtDate(p.created_at)}</td>
+    </tr>`).join(''):'<tr class="loading-row"><td colspan="6">No payments yet</td></tr>';
+  }catch(e){document.getElementById('payments-tbody').innerHTML=`<tr class="loading-row"><td colspan="6" style="color:var(--danger)">Error: ${e.message}</td></tr>`;}
+}
+
+// PLANS
+async function loadPlans(){
+  try{
+    const data=await sb('plans',{select:'*',order:'price.asc'});
+    const colors=['badge-grey','badge-blue','badge-green','badge-yellow'];
+    document.getElementById('plans-grid').innerHTML=data.length?data.map((p,i)=>`
+      <div class="plan-card ${p.name==='Pro'?'featured':''}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">
+          <div class="plan-name">${p.name}</div>
+          <span class="badge ${colors[i%colors.length]}">${p.is_active!==false?'ACTIVE':'OFF'}</span>
+        </div>
+        <div class="plan-price">${p.price===0?'FREE':'RM '+p.price}</div>
+        <div class="plan-stat">${p.max_messages||'Unlimited'} messages/month</div>
+        <div class="plan-stat">${p.duration_days||30} days</div>
+        <div class="plan-stat" style="margin-top:8px;color:var(--text2)">${p.description||''}</div>
+        <div class="revenue-bar"><div class="revenue-fill" style="width:${Math.min(100,(p.price/399)*100)}%"></div></div>
+        <div style="display:flex;gap:8px;margin-top:14px">
+          <button class="action-btn danger" onclick="deletePlan('${p.id}')">Delete</button>
+        </div>
+      </div>`).join(''):'<div class="plan-card" style="color:var(--text3)">No plans yet</div>';
+  }catch(e){document.getElementById('plans-grid').innerHTML=`<div class="plan-card" style="color:var(--danger)">Error: ${e.message}</div>`;}
+}
+
+async function addPlan(){
+  const body={name:document.getElementById('new-plan-name').value,price:parseFloat(document.getElementById('new-plan-price').value)||0,description:document.getElementById('new-plan-desc').value||null,max_messages:parseInt(document.getElementById('new-plan-msgs').value)||null,duration_days:parseInt(document.getElementById('new-plan-days').value)||30,is_active:true};
+  if(!body.name){toast('Plan name required','error');return;}
+  try{await sb('plans',{method:'POST',body});toast('Plan created','success');closeModal('modal-add-plan');loadPlans();}catch(e){toast('Failed: '+e.message,'error');}
+}
+
+async function deletePlan(id){if(!confirm('Delete this plan?'))return;try{await sbDelete('plans',id);toast('Deleted','success');loadPlans();}catch(e){toast('Failed: '+e.message,'error');}}
+
+// PROMOS
+async function loadPromos(){
+  try{
+    const data=await sb('promos',{select:'*',order:'created_at.desc'});
+    document.getElementById('promos-tbody').innerHTML=data.length?data.map(p=>`<tr>
+      <td><b style="font-family:'DM Mono',monospace;letter-spacing:1px">${p.code}</b></td>
+      <td><b>${p.discount_value||0}${p.discount_type==='percent'?'%':' RM'}</b></td>
+      <td>${p.discount_type||'—'}</td>
+      <td>${p.used_count||0}</td>
+      <td>${p.max_uses||'Unlimited'}</td>
+      <td style="color:var(--text3);font-size:12px">${fmtDate(p.expires_at)}</td>
+      <td>${p.is_active!==false?'<span class="badge badge-green">ACTIVE</span>':'<span class="badge badge-red">EXPIRED</span>'}</td>
+      <td><button class="action-btn danger" onclick="deletePromo('${p.id}')">Delete</button></td>
+    </tr>`).join(''):'<tr class="loading-row"><td colspan="8">No promos yet</td></tr>';
+  }catch(e){document.getElementById('promos-tbody').innerHTML=`<tr class="loading-row"><td colspan="8" style="color:var(--danger)">Error: ${e.message}</td></tr>`;}
+}
+
+async function addPromo(){
+  const body={code:document.getElementById('new-promo-code').value.toUpperCase(),discount_type:document.getElementById('new-promo-type').value,discount_value:parseFloat(document.getElementById('new-promo-value').value)||0,max_uses:parseInt(document.getElementById('new-promo-max').value)||null,expires_at:document.getElementById('new-promo-expiry').value||null,used_count:0,is_active:true};
+  if(!body.code){toast('Code required','error');return;}
+  try{await sb('promos',{method:'POST',body});toast('Promo created','success');closeModal('modal-add-promo');loadPromos();}catch(e){toast('Failed: '+e.message,'error');}
+}
+
+async function deletePromo(id){if(!confirm('Delete this promo?'))return;try{await sbDelete('promos',id);toast('Deleted','success');loadPromos();}catch(e){toast('Failed: '+e.message,'error');}}
+
+// BOT CONTROLS
+async function loadBotControls(){
+  try{
+    const [controls,clients]=await Promise.all([
+      sb('bot_controls',{select:'*'}),
+      sb('clients',{select:'id,business_name,category,is_active'})
+    ]);
+    const list=document.getElementById('bot-controls-list');
+    if(!clients.length){list.innerHTML='<div style="color:var(--text3);padding:24px;text-align:center">No clients yet</div>';return;}
+    const catIcon={klinik:'M',salon:'S',restaurant:'R',workshop:'W'};
+    list.innerHTML=clients.map(c=>{
+      const ctrl=controls.find(bc=>bc.client_id===c.id);
+      const running=ctrl?ctrl.is_active!==false:true;
+      return `<div class="bot-card">
+        <div class="bot-card-left">
+          <div class="bot-card-avatar">
+            <svg width="20" height="20" fill="none" stroke="#000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-bot"/></svg>
+          </div>
+          <div>
+            <div class="bot-card-name">${c.business_name}</div>
+            <div class="bot-card-cat">${c.category||'business'} &middot; <span style="color:${running?'var(--accent)':'var(--danger)'}">${running?'Bot Running':'Bot Paused'}</span></div>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="font-size:12px;color:var(--text3)">${running?'Active':'Paused'}</span>
+          <label class="toggle-switch">
+            <input type="checkbox" ${running?'checked':''} onchange="toggleBot('${c.id}',this.checked,'${ctrl?.id||''}')">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+      </div>`;
+    }).join('');
+  }catch(e){document.getElementById('bot-controls-list').innerHTML=`<div style="color:var(--danger);padding:16px">Error: ${e.message}</div>`;}
+}
+
+async function toggleBot(clientId,active,controlId){
+  try{
+    if(controlId){await sbPatch('bot_controls',controlId,{is_active:active});}
+    else{await sb('bot_controls',{method:'POST',body:{client_id:clientId,is_active:active}});}
+    toast(`Bot ${active?'resumed':'paused'}`,'success');
+  }catch(e){toast('Failed: '+e.message,'error');loadBotControls();}
+}
+
+// MESSAGES
+async function loadMessages(){
+  try{
+    const data=await sb('message_logs',{select:'*',order:'created_at.desc',limit:50});
+    document.getElementById('messages-list').innerHTML=data.length?data.map(m=>`
+      <div class="log-entry">
+        <div class="log-time">${fmtDT(m.created_at)}</div>
+        <div style="flex:1">
+          <div class="log-phone">${m.customer_phone||m.from_number||'—'}</div>
+          <div class="log-msg">${m.customer_message||m.message||'—'}</div>
+          ${m.ai_reply||m.bot_reply?`<div class="log-reply">Bot: ${m.ai_reply||m.bot_reply}</div>`:''}
+        </div>
+        <span class="badge badge-grey" style="white-space:nowrap">${shortId(m.client_id||m.id)}</span>
+      </div>`).join(''):'<div class="empty-state"><div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ic-msg"/></svg></div><div class="empty-state-text">No messages logged yet</div></div>';
+  }catch(e){document.getElementById('messages-list').innerHTML=`<div style="padding:24px;text-align:center;color:var(--danger)">Error: ${e.message}</div>`;}
+}
+
+// NOTIFICATIONS
+async function loadNotifications(){
+  try{
+    const data=await sb('notifications',{select:'*',order:'created_at.desc'});
+    document.getElementById('notif-tbody').innerHTML=data.length?data.map(n=>`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${n.client_id?shortId(n.client_id):'ALL'}</td>
+      <td><b>${n.title||'—'}</b></td>
+      <td style="color:var(--text2);font-size:12px">${n.message||'—'}</td>
+      <td><span class="badge ${n.type==='warning'?'badge-yellow':n.type==='error'?'badge-red':n.type==='success'?'badge-green':'badge-blue'}">${(n.type||'info').toUpperCase()}</span></td>
+      <td style="color:var(--text3);font-size:12px">${fmtDT(n.created_at)}</td>
+      <td>${n.is_read?'<span class="badge badge-green">READ</span>':'<span class="badge badge-grey">UNREAD</span>'}</td>
+    </tr>`).join(''):'<tr class="loading-row"><td colspan="6">No notifications yet</td></tr>';
+  }catch(e){document.getElementById('notif-tbody').innerHTML=`<tr class="loading-row"><td colspan="6" style="color:var(--danger)">Error: ${e.message}</td></tr>`;}
+}
+
+async function sendNotification(){
+  const body={title:document.getElementById('notif-title').value,message:document.getElementById('notif-msg').value,type:document.getElementById('notif-type').value,is_read:false};
+  if(!body.title){toast('Title required','error');return;}
+  try{await sb('notifications',{method:'POST',body});toast('Sent','success');closeModal('modal-send-notif');loadNotifications();}catch(e){toast('Failed: '+e.message,'error');}
+}
+
+// AUDIT LOGS
+async function loadAuditLogs(){
+  try{
+    const data=await sb('audit_logs',{select:'*',order:'created_at.desc',limit:100});
+    document.getElementById('audit-list').innerHTML=data.length?`<div style="padding:12px 20px">${data.map(a=>`<div class="audit-item"><div class="audit-dot ${a.action_type==='delete'?'red':a.action_type==='update'?'blue':a.action_type==='login'?'yellow':''}"></div><div><div class="audit-action">${a.action||a.action_type||'Action recorded'}</div><div class="audit-meta">${fmtDT(a.created_at)} &middot; ${a.admin_id||'System'} &middot; ${a.table_name||'—'}</div></div></div>`).join('')}</div>`:'<div class="empty-state"><div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><use href="#ic-list"/></svg></div><div class="empty-state-text">No audit entries yet</div></div>';
+  }catch(e){document.getElementById('audit-list').innerHTML=`<div style="padding:24px;color:var(--danger)">Error: ${e.message}</div>`;}
+}
+
+// SETTINGS
+async function loadSettings(){
+  try{
+    const [settings,reminders]=await Promise.all([
+      sb('admin_settings',{select:'*'}),
+      sb('payment_reminders',{select:'*',order:'due_date.asc'})
+    ]);
+    const body=document.getElementById('admin-settings-body');
+    body.innerHTML=settings.length?settings.map(s=>`<div class="form-group"><label class="form-label">${s.key||s.setting_key||'Setting'}</label><input class="form-input" type="text" value="${s.value||s.setting_value||''}" onchange="updateSetting('${s.id}',this.value)"></div>`).join(''):'<div style="color:var(--text3);font-size:13px">No settings configured yet</div>';
+    document.getElementById('reminders-tbody').innerHTML=reminders.length?reminders.map(r=>`<tr>
+      <td style="font-family:'DM Mono',monospace;font-size:11px">${shortId(r.client_id)}</td>
+      <td style="color:var(--text3);font-size:12px">${fmtDate(r.due_date)}</td>
+      <td><b>RM ${(r.amount||0).toFixed(2)}</b></td>
+      <td>${r.is_sent?'<span class="badge badge-green">SENT</span>':'<span class="badge badge-yellow">PENDING</span>'}</td>
+      <td style="color:var(--text3);font-size:12px">${fmtDT(r.sent_at)}</td>
+    </tr>`).join(''):'<tr class="loading-row"><td colspan="5">No payment reminders</td></tr>';
+  }catch(e){console.error('Settings:',e);}
+}
+
+async function updateSetting(id,value){try{await sbPatch('admin_settings',id,{value});toast('Updated','success');}catch(e){toast('Failed: '+e.message,'error');}}
+
+loadAllData();
+setInterval(loadAllData,60000);
+</script>
+</body>
+</html>
