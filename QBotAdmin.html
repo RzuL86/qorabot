@@ -2980,7 +2980,7 @@ async function loadKnowledge() {
         </div>
         <div>
           <label class="form-label">Contact Info</label>
-          <input class="form-input" id="kb-contact" value="${d.contact_number||''}" placeholder="e.g. Call/WhatsApp 012-3456789">
+          <input class="form-input" id="kb-contact" value="${d.contact_info||''}" placeholder="e.g. Call/WhatsApp 012-3456789">
         </div>
         <div>
           <label class="form-label">Services / Packages / Menu Notes</label>
@@ -3031,7 +3031,7 @@ async function saveKnowledge(clientId, existingId) {
     business_type: document.getElementById('kb-type').value.trim(),
     about: document.getElementById('kb-about').value.trim(),
     location: document.getElementById('kb-location').value.trim(),
-    contact_number: document.getElementById('kb-contact').value.trim(),
+    contact_info: document.getElementById('kb-contact').value.trim(),
     services_notes: document.getElementById('kb-services').value.trim(),
     custom_instructions: document.getElementById('kb-instructions').value.trim(),
     faq: document.getElementById('kb-faq').value.trim(),
