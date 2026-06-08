@@ -2019,72 +2019,25 @@ async function registerWebhook(){
   }
 }
 
-async function loadConvStats() {
+function loadConvStats() {
   const wabaId = document.getElementById('detail-waba-id').value.trim();
-  const accessToken = document.getElementById('detail-access-token').value.trim();
   const el = document.getElementById('conv-stats-content');
-
-  if (!wabaId || !accessToken) {
-    el.innerHTML = '<div style="color:var(--danger);font-size:12px;">WABA ID and Access Token required.</div>';
-    return;
-  }
-
-  el.innerHTML = '<div style="color:var(--text3);font-size:12px;">Loading...</div>';
-
-  try {
-    // Get start of current month and today as Unix timestamps
-    const now = new Date();
-    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-    const start = Math.floor(startOfMonth.getTime() / 1000);
-    const end = Math.floor(now.getTime() / 1000);
-
-    const url = `https://graph.facebook.com/v25.0/${wabaId}?fields=conversation_analytics.start(${start}).end(${end}).granularity(MONTHLY).dimensions(["conversation_direction"])&access_token=${accessToken}`;
-
-    const res = await fetch(url);
-    const data = await res.json();
-
-    if (!res.ok) throw new Error(data.error?.message || 'API error');
-
-    // Parse results
-    let businessInit = 0;
-    let userInit = 0;
-
-    const points = data?.conversation_analytics?.data?.[0]?.data_points || data?.data?.data_points || [];
-    points.forEach(p => {
-      if (p.conversation_direction === 'BUSINESS_INITIATED') businessInit += (p.conversation || 0);
-      if (p.conversation_direction === 'USER_INITIATED') userInit += (p.conversation || 0);
-    });
-
-    const free = 1000;
-    const remaining = Math.max(0, free - businessInit);
-    const pct = Math.min(100, Math.round((businessInit / free) * 100));
-    const barColor = pct < 50 ? '#22c55e' : pct < 80 ? '#f59e0b' : '#ef4444';
-    const monthName = now.toLocaleString('default', { month: 'long', year: 'numeric' });
-
-    el.innerHTML = `
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">${monthName}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-        <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:20px;font-weight:700;color:var(--text1);">${businessInit}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px;">Business-initiated</div>
-        </div>
-        <div style="background:var(--bg3);border-radius:8px;padding:10px;text-align:center;">
-          <div style="font-size:20px;font-weight:700;color:${barColor};">${remaining}</div>
-          <div style="font-size:10px;color:var(--text3);margin-top:2px;">Free remaining</div>
-        </div>
-      </div>
-      <div style="background:var(--bg3);border-radius:4px;height:8px;overflow:hidden;">
-        <div style="background:${barColor};height:100%;width:${pct}%;border-radius:4px;transition:width .3s;"></div>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-top:4px;">
-        <span style="font-size:10px;color:var(--text3);">${pct}% used</span>
-        <span style="font-size:10px;color:var(--text3);">Free limit: 1,000/month</span>
-      </div>
-      <div style="margin-top:8px;font-size:11px;color:var(--text3);">User-initiated (free): <b style="color:var(--text2);">${userInit}</b></div>
-    `;
-  } catch(e) {
-    el.innerHTML = `<div style="color:var(--danger);font-size:12px;">Failed: ${e.message}</div>`;
-  }
+  const now = new Date();
+  const monthName = now.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const dashUrl = wabaId
+    ? `https://business.facebook.com/wa/manage/phone-numbers/?waba_id=${wabaId}`
+    : 'https://business.facebook.com/wa/manage/phone-numbers/';
+  el.innerHTML = `
+    <div style="font-size:11px;color:var(--text3);margin-bottom:8px;">${monthName}</div>
+    <div style="background:var(--bg3);border-radius:8px;padding:12px;margin-bottom:10px;">
+      <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Free tier: <b style="color:var(--accent);">1,000 business-initiated/month</b></div>
+      <div style="font-size:11px;color:var(--text3);line-height:1.6;">Charges apply only after 1,000 msgs/month.<br>Est. rate: ~RM0.08u20130.15 per conversation.</div>
+    </div>
+    <a href="${dashUrl}" target="_blank" style="display:flex;align-items:center;gap:6px;background:var(--accent);color:#000;font-size:12px;font-weight:600;padding:8px 14px;border-radius:8px;text-decoration:none;justify-content:center;">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      View Usage in Meta Dashboard
+    </a>
+  `;
 }
 
 async function addClient(){
