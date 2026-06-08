@@ -825,7 +825,7 @@ textarea.form-input{resize:vertical;}
       <div class="section-header">
         <div><div class="section-title">Settings</div><div class="section-sub">Platform configuration</div></div>
       </div>
-      <div class="two-col">
+      <div>
         <div class="card">
           <div class="card-header"><span class="card-title">Supabase Connection</span></div>
           <div class="card-body" style="padding:20px">
@@ -966,8 +966,8 @@ textarea.form-input{resize:vertical;}
       <div class="card">
         <div class="card-header"><span class="card-title">Payment Reminders</span></div>
         <table class="data-table">
-          <thead><tr><th>Client ID</th><th>Due Date</th><th>Amount</th><th>Status</th><th>Sent At</th></tr></thead>
-          <tbody id="reminders-tbody"><tr class="loading-row"><td colspan="5">Loading...</td></tr></tbody>
+          <thead><tr><th>Client ID</th><th>Subscription</th><th>Type</th><th>Sent At</th></tr></thead>
+          <tbody id="reminders-tbody"><tr class="loading-row"><td colspan="4">Loading...</td></tr></tbody>
         </table>
       </div>
     </div>
@@ -2693,7 +2693,7 @@ async function loadSettings(){
   try{
     const settings = await sb('admin_settings',{select:'*'});
     const aiKeys = ['ai_provider','ai_endpoint','ai_model','ai_api_key'];
-    // Populate AI Provider card from same fetch
+    // Populate AI Provider card
     const s = {};
     settings.filter(r => aiKeys.includes(r.key)).forEach(r => s[r.key] = r.value);
     const provider = s['ai_provider'] || 'cerebras';
@@ -2704,22 +2704,22 @@ async function loadSettings(){
     if (document.getElementById('ai-endpoint-input')) document.getElementById('ai-endpoint-input').value = s['ai_endpoint'] || AI_PRESETS[provider]?.endpoint || '';
     if (document.getElementById('ai-model-input')) document.getElementById('ai-model-input').value = s['ai_model'] || AI_PRESETS[provider]?.model || '';
     if (document.getElementById('ai-apikey-input')) document.getElementById('ai-apikey-input').value = s['ai_api_key'] || '';
+    // Populate Admin Settings card (exclude AI rows)
     const filteredSettings = settings.filter(s => !aiKeys.includes(s.key));
     if(body) body.innerHTML=filteredSettings.length?filteredSettings.map(s=>`<div class="form-group"><label class="form-label">${s.key||s.setting_key||'Setting'}</label><input class="form-input" type="text" value="${s.value||s.setting_value||''}" onchange="updateSetting('${s.id}',this.value)"></div>`).join(''):'<div style="color:var(--text3);font-size:13px">No settings configured yet</div>';
   }catch(e){
     if(body) body.innerHTML=`<div style="color:var(--danger);font-size:13px">Error: ${e.message}</div>`;
   }
   try{
-    const reminders = await sb('payment_reminders',{select:'*',order:'due_date.asc'});
+    const reminders = await sb('payment_reminders',{select:'*',order:'sent_at.desc'});
     if(remindersTbody) remindersTbody.innerHTML=reminders.length?reminders.map(r=>`<tr>
       <td style="font-family:'Courier New',Courier,monospace;font-size:11px">${shortId(r.client_id)}</td>
-      <td style="color:var(--text3);font-size:12px">${fmtDate(r.due_date)}</td>
-      <td><b>RM ${(r.amount||0).toFixed(2)}</b></td>
-      <td>${r.is_sent?'<span class="badge badge-green">SENT</span>':'<span class="badge badge-yellow">PENDING</span>'}</td>
+      <td style="font-family:'Courier New',Courier,monospace;font-size:11px">${shortId(r.subscription_id)}</td>
+      <td><span class="badge badge-blue">${(r.reminder_type||'—').toUpperCase()}</span></td>
       <td style="color:var(--text3);font-size:12px">${fmtDT(r.sent_at)}</td>
-    </tr>`).join(''):'<tr class="loading-row"><td colspan="5">No payment reminders yet</td></tr>';
+    </tr>`).join(''):'<tr class="loading-row"><td colspan="4">No payment reminders yet</td></tr>';
   }catch(e){
-    if(remindersTbody) remindersTbody.innerHTML=`<tr class="loading-row"><td colspan="5" style="color:var(--danger)">Error: ${e.message}</td></tr>`;
+    if(remindersTbody) remindersTbody.innerHTML=`<tr class="loading-row"><td colspan="4" style="color:var(--danger)">Error: ${e.message}</td></tr>`;
   }
 }
 
