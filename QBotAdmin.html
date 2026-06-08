@@ -880,7 +880,12 @@ textarea.form-input{resize:vertical;}
         <div class="card-body" style="padding:20px">
           <div class="form-group">
             <label class="form-label">Groq API Key</label>
-            <input class="form-input" type="password" id="groq-key-input" placeholder="gsk_..." style="font-family:'Courier New',Courier,monospace;">
+            <div style="position:relative;">
+              <input class="form-input" type="password" id="groq-key-input" placeholder="gsk_..." style="font-family:'Courier New',Courier,monospace;padding-right:38px;">
+              <button type="button" onclick="togglePwField('groq-key-input','groq-key-eye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;">
+                <svg id="groq-key-eye" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
+              </button>
+            </div>
             <div style="font-size:11px;color:var(--text3);margin-top:5px;">Used for AI Setup from PDF in Knowledge Base. Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--accent)">console.groq.com</a>.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -895,7 +900,12 @@ textarea.form-input{resize:vertical;}
         <div class="card-body" style="padding:20px">
           <div class="form-group">
             <label class="form-label">Anthropic API Key</label>
-            <input class="form-input" type="password" id="haiku-key-input" placeholder="sk-ant-..." style="font-family:'Courier New',Courier,monospace;">
+            <div style="position:relative;">
+              <input class="form-input" type="password" id="haiku-key-input" placeholder="sk-ant-..." style="font-family:'Courier New',Courier,monospace;padding-right:38px;">
+              <button type="button" onclick="togglePwField('haiku-key-input','haiku-key-eye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;">
+                <svg id="haiku-key-eye" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
+              </button>
+            </div>
             <div style="font-size:11px;color:var(--text3);margin-top:5px;">Used when switching bot AI to Claude Haiku. Get your key at <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a>. Stored locally only.</div>
           </div>
           <div style="display:flex;gap:8px;flex-wrap:wrap;">
@@ -2640,23 +2650,6 @@ function onAiProviderChange(provider) {
   document.getElementById('ai-apikey-input').value = saved || '';
 }
 
-async function loadAiProvider() {
-  try {
-    const rows = await sb('admin_settings', { select: '*' });
-    const aiKeys = ['ai_provider','ai_endpoint','ai_model','ai_api_key'];
-    const s = {};
-    rows.filter(r => aiKeys.includes(r.key)).forEach(r => s[r.key] = r.value);
-    const provider = s['ai_provider'] || 'cerebras';
-    const sel = document.getElementById('ai-provider-select');
-    if (sel) sel.value = provider;
-    const badge = document.getElementById('ai-provider-badge');
-    if (badge) badge.textContent = provider.toUpperCase();
-    if (document.getElementById('ai-endpoint-input')) document.getElementById('ai-endpoint-input').value = s['ai_endpoint'] || AI_PRESETS[provider]?.endpoint || '';
-    if (document.getElementById('ai-model-input')) document.getElementById('ai-model-input').value = s['ai_model'] || AI_PRESETS[provider]?.model || '';
-    if (document.getElementById('ai-apikey-input')) document.getElementById('ai-apikey-input').value = s['ai_api_key'] || '';
-  } catch(e) { console.warn('loadAiProvider:', e.message); }
-}
-
 async function saveAiProvider() {
   const provider = document.getElementById('ai-provider-select').value;
   const endpoint = document.getElementById('ai-endpoint-input').value.trim();
@@ -2690,30 +2683,44 @@ async function saveAiProvider() {
 }
 
 async function loadSettings(){
-  // Load AI provider switcher
-  loadAiProvider();
   // Pre-fill Groq key if saved
   const saved = localStorage.getItem('wabot_groq_key');
   if (saved && document.getElementById('groq-key-input')) document.getElementById('groq-key-input').value = saved;
   const savedHaiku = localStorage.getItem('wabot_haiku_key');
   if (savedHaiku && document.getElementById('haiku-key-input')) document.getElementById('haiku-key-input').value = savedHaiku;
+  const body=document.getElementById('admin-settings-body');
+  const remindersTbody=document.getElementById('reminders-tbody');
   try{
-    const [settings,reminders]=await Promise.all([
-      sb('admin_settings',{select:'*'}),
-      sb('payment_reminders',{select:'*',order:'due_date.asc'})
-    ]);
-    const body=document.getElementById('admin-settings-body');
+    const settings = await sb('admin_settings',{select:'*'});
     const aiKeys = ['ai_provider','ai_endpoint','ai_model','ai_api_key'];
+    // Populate AI Provider card from same fetch
+    const s = {};
+    settings.filter(r => aiKeys.includes(r.key)).forEach(r => s[r.key] = r.value);
+    const provider = s['ai_provider'] || 'cerebras';
+    const sel = document.getElementById('ai-provider-select');
+    if (sel) sel.value = provider;
+    const badge = document.getElementById('ai-provider-badge');
+    if (badge) badge.textContent = provider.toUpperCase();
+    if (document.getElementById('ai-endpoint-input')) document.getElementById('ai-endpoint-input').value = s['ai_endpoint'] || AI_PRESETS[provider]?.endpoint || '';
+    if (document.getElementById('ai-model-input')) document.getElementById('ai-model-input').value = s['ai_model'] || AI_PRESETS[provider]?.model || '';
+    if (document.getElementById('ai-apikey-input')) document.getElementById('ai-apikey-input').value = s['ai_api_key'] || '';
     const filteredSettings = settings.filter(s => !aiKeys.includes(s.key));
     if(body) body.innerHTML=filteredSettings.length?filteredSettings.map(s=>`<div class="form-group"><label class="form-label">${s.key||s.setting_key||'Setting'}</label><input class="form-input" type="text" value="${s.value||s.setting_value||''}" onchange="updateSetting('${s.id}',this.value)"></div>`).join(''):'<div style="color:var(--text3);font-size:13px">No settings configured yet</div>';
-    document.getElementById('reminders-tbody').innerHTML=reminders.length?reminders.map(r=>`<tr>
+  }catch(e){
+    if(body) body.innerHTML=`<div style="color:var(--danger);font-size:13px">Error: ${e.message}</div>`;
+  }
+  try{
+    const reminders = await sb('payment_reminders',{select:'*',order:'due_date.asc'});
+    if(remindersTbody) remindersTbody.innerHTML=reminders.length?reminders.map(r=>`<tr>
       <td style="font-family:'Courier New',Courier,monospace;font-size:11px">${shortId(r.client_id)}</td>
       <td style="color:var(--text3);font-size:12px">${fmtDate(r.due_date)}</td>
       <td><b>RM ${(r.amount||0).toFixed(2)}</b></td>
       <td>${r.is_sent?'<span class="badge badge-green">SENT</span>':'<span class="badge badge-yellow">PENDING</span>'}</td>
       <td style="color:var(--text3);font-size:12px">${fmtDT(r.sent_at)}</td>
-    </tr>`).join(''):'<tr class="loading-row"><td colspan="5">No payment reminders</td></tr>';
-  }catch(e){console.error('Settings:',e);}
+    </tr>`).join(''):'<tr class="loading-row"><td colspan="5">No payment reminders yet</td></tr>';
+  }catch(e){
+    if(remindersTbody) remindersTbody.innerHTML=`<tr class="loading-row"><td colspan="5" style="color:var(--danger)">Error: ${e.message}</td></tr>`;
+  }
 }
 
 async function updateSetting(id,value){try{await sbPatch('admin_settings',id,{value});toast('Updated','success');}catch(e){toast('Failed: '+e.message,'error');}}
