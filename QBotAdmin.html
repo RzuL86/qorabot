@@ -2038,7 +2038,7 @@ async function loadConvStats() {
     const start = Math.floor(startOfMonth.getTime() / 1000);
     const end = Math.floor(now.getTime() / 1000);
 
-    const url = `https://graph.facebook.com/v25.0/${wabaId}/conversation_analytics?start=${start}&end=${end}&granularity=MONTHLY&dimensions=%5B%22conversation_category%22%2C%22conversation_direction%22%5D&access_token=${accessToken}`;
+    const url = `https://graph.facebook.com/v25.0/${wabaId}?fields=conversation_analytics.start(${start}).end(${end}).granularity(MONTHLY).dimensions(["conversation_direction"])&access_token=${accessToken}`;
 
     const res = await fetch(url);
     const data = await res.json();
@@ -2049,7 +2049,7 @@ async function loadConvStats() {
     let businessInit = 0;
     let userInit = 0;
 
-    const points = data?.data?.data_points || [];
+    const points = data?.conversation_analytics?.data?.[0]?.data_points || data?.data?.data_points || [];
     points.forEach(p => {
       if (p.conversation_direction === 'BUSINESS_INITIATED') businessInit += (p.conversation || 0);
       if (p.conversation_direction === 'USER_INITIATED') userInit += (p.conversation || 0);
