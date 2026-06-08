@@ -2038,15 +2038,7 @@ async function loadConvStats() {
     const start = Math.floor(startOfMonth.getTime() / 1000);
     const end = Math.floor(now.getTime() / 1000);
 
-    const params = new URLSearchParams({
-      start: start,
-      end: end,
-      granularity: 'MONTHLY',
-      dimensions: JSON.stringify(['conversation_category','conversation_direction']),
-      access_token: accessToken
-    });
-
-    const url = `https://graph.facebook.com/v25.0/${wabaId}/conversation_analytics?${params.toString()}`;
+    const url = `https://graph.facebook.com/v25.0/${wabaId}/conversation_analytics?start=${start}&end=${end}&granularity=MONTHLY&dimensions=%5B%22conversation_category%22%2C%22conversation_direction%22%5D&access_token=${accessToken}`;
 
     const res = await fetch(url);
     const data = await res.json();
