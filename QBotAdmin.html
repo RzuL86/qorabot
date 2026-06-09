@@ -2726,7 +2726,7 @@ async function saveAiProvider() {
     const updates = { ai_provider: provider, ai_endpoint: endpoint, ai_model: model, ai_api_key: apiKey };
     for (const [key, value] of Object.entries(updates)) {
       if (idMap[key]) {
-        await sbPatch('admin_settings', idMap[key], { value, updated_at: new Date().toISOString() });
+        await sbPatch('admin_settings', idMap[key], { value });
       } else {
         await sb('admin_settings', { method: 'POST', body: { key, value, description: 'AI provider setting' } });
       }
@@ -2734,9 +2734,15 @@ async function saveAiProvider() {
     // Save key to localStorage too
     const keyMap = { groq: 'wabot_groq_key', haiku: 'wabot_haiku_key', cerebras: 'wabot_cerebras_key' };
     if (keyMap[provider]) localStorage.setItem(keyMap[provider], apiKey);
+    // Verify read-back — confirm Supabase actually saved
+    const verify = await sb('admin_settings', { select: 'key,value' });
+    const savedProvider = verify.find(r => r.key === 'ai_provider')?.value;
     const badge = document.getElementById('ai-provider-badge');
-    if (badge) badge.textContent = provider.toUpperCase();
-    st.style.color='var(--accent)'; st.textContent='✓ Saved — bot will use ' + provider.toUpperCase() + ' on next message.';
+    if (badge) badge.textContent = (savedProvider || provider).toUpperCase();
+    if (savedProvider !== provider) {
+      st.style.color='var(--danger)'; st.textContent='Warning: Save may have failed — refresh and check.'; return;
+    }
+    st.style.color='var(--accent)'; st.textContent='Saved — bot will use ' + provider.toUpperCase() + ' on next message.';
     setTimeout(()=>st.style.display='none', 4000);
   } catch(e) { st.style.color='var(--danger)'; st.textContent='Failed: '+e.message; }
 }
