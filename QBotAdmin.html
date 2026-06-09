@@ -941,6 +941,26 @@ textarea.form-input{resize:vertical;}
           <div id="haiku-key-status" style="margin-top:10px;font-size:12px;display:none;"></div>
         </div>
       </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">Cerebras API Key</span></div>
+        <div class="card-body" style="padding:20px">
+          <div class="form-group">
+            <label class="form-label">Cerebras API Key</label>
+            <div style="position:relative;">
+              <input class="form-input" type="password" id="cerebras-key-input" placeholder="csk_..." style="font-family:'Courier New',Courier,monospace;padding-right:38px;">
+              <button type="button" onclick="togglePwField('cerebras-key-input','cerebras-key-eye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;">
+                <svg id="cerebras-key-eye" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
+              </button>
+            </div>
+            <div style="font-size:11px;color:var(--text3);margin-top:5px;">Used when switching bot AI to Cerebras. Get a free key at <a href="https://cloud.cerebras.ai" target="_blank" style="color:var(--accent)">cloud.cerebras.ai</a>. Stored locally only.</div>
+          </div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <button class="topbar-btn btn-primary" onclick="saveCerebrasKey()">Save Key</button>
+            <button class="topbar-btn" onclick="clearCerebrasKey()" style="color:var(--danger);border-color:var(--danger);">Clear Key</button>
+          </div>
+          <div id="cerebras-key-status" style="margin-top:10px;font-size:12px;display:none;"></div>
+        </div>
+      </div>
       <!-- AI PROVIDER SWITCHER -->
       <div class="card">
         <div class="card-header">
@@ -2682,6 +2702,25 @@ function clearHaikuKey() {
   setTimeout(()=>st.style.display='none', 2000);
 }
 
+function saveCerebrasKey() {
+  const val = document.getElementById('cerebras-key-input').value.trim();
+  const st = document.getElementById('cerebras-key-status');
+  if (!val.startsWith('csk_')) {
+    st.style.display='block'; st.style.color='var(--danger)'; st.textContent='Key must start with csk_'; return;
+  }
+  localStorage.setItem('wabot_cerebras_key', val);
+  st.style.display='block'; st.style.color='var(--accent)'; st.textContent='Key saved';
+  setTimeout(()=>st.style.display='none', 3000);
+}
+
+function clearCerebrasKey() {
+  localStorage.removeItem('wabot_cerebras_key');
+  document.getElementById('cerebras-key-input').value = '';
+  const st = document.getElementById('cerebras-key-status');
+  st.style.display='block'; st.style.color='var(--text3)'; st.textContent='Key cleared.';
+  setTimeout(()=>st.style.display='none', 2000);
+}
+
 // AI PROVIDER SWITCHER
 const AI_PRESETS = {
   cerebras: {
@@ -2720,21 +2759,31 @@ async function saveAiProvider() {
   }
   st.style.display='block'; st.style.color='var(--text3)'; st.textContent='Saving...';
   try {
-    const rows = await sb('admin_settings', { select: 'id,key' });
-    const idMap = {};
-    rows.forEach(r => idMap[r.key] = r.id);
-    const updates = { ai_provider: provider, ai_endpoint: endpoint, ai_model: model, ai_api_key: apiKey };
-    for (const [key, value] of Object.entries(updates)) {
-      if (idMap[key]) {
-        await sbPatch('admin_settings', idMap[key], { value });
-      } else {
-        await sb('admin_settings', { method: 'POST', body: { key, value, description: 'AI provider setting' } });
-      }
+    // Use upsert on key column — works whether rows exist or not
+    const updates = [
+      { key: 'ai_provider', value: provider, description: 'AI provider setting' },
+      { key: 'ai_endpoint', value: endpoint, description: 'AI provider setting' },
+      { key: 'ai_model', value: model, description: 'AI provider setting' },
+      { key: 'ai_api_key', value: apiKey, description: 'AI provider setting' }
+    ];
+    const r = await fetch(`${SUPABASE_URL}/rest/v1/admin_settings`, {
+      method: 'POST',
+      headers: {
+        'apikey': SUPABASE_KEY,
+        'Authorization': 'Bearer ' + SUPABASE_KEY,
+        'Content-Type': 'application/json',
+        'Prefer': 'resolution=merge-duplicates,return=minimal'
+      },
+      body: JSON.stringify(updates)
+    });
+    if (!r.ok && r.status !== 204) {
+      const e = await r.json().catch(()=>({}));
+      throw new Error(e.message || e.hint || r.statusText || 'Upsert failed');
     }
-    // Save key to localStorage too
+    // Save key to localStorage
     const keyMap = { groq: 'wabot_groq_key', haiku: 'wabot_haiku_key', cerebras: 'wabot_cerebras_key' };
     if (keyMap[provider]) localStorage.setItem(keyMap[provider], apiKey);
-    // Verify read-back — confirm Supabase actually saved
+    // Verify read-back
     const verify = await sb('admin_settings', { select: 'key,value' });
     const savedProvider = verify.find(r => r.key === 'ai_provider')?.value;
     const badge = document.getElementById('ai-provider-badge');
@@ -2742,7 +2791,7 @@ async function saveAiProvider() {
     if (savedProvider !== provider) {
       st.style.color='var(--danger)'; st.textContent='Warning: Save may have failed — refresh and check.'; return;
     }
-    st.style.color='var(--accent)'; st.textContent='Saved — bot will use ' + provider.toUpperCase() + ' on next message.';
+    st.style.color='var(--accent)'; st.textContent='Saved — bot now using ' + provider.toUpperCase() + '.';
     setTimeout(()=>st.style.display='none', 4000);
   } catch(e) { st.style.color='var(--danger)'; st.textContent='Failed: '+e.message; }
 }
@@ -2753,6 +2802,8 @@ async function loadSettings(){
   if (saved && document.getElementById('groq-key-input')) document.getElementById('groq-key-input').value = saved;
   const savedHaiku = localStorage.getItem('wabot_haiku_key');
   if (savedHaiku && document.getElementById('haiku-key-input')) document.getElementById('haiku-key-input').value = savedHaiku;
+  const savedCerebras = localStorage.getItem('wabot_cerebras_key');
+  if (savedCerebras && document.getElementById('cerebras-key-input')) document.getElementById('cerebras-key-input').value = savedCerebras;
   const body=document.getElementById('admin-settings-body');
   const remindersTbody=document.getElementById('reminders-tbody');
   try{
