@@ -808,6 +808,7 @@ textarea.form-input{resize:vertical;}
           <svg width="14" height="14" fill="none" stroke="var(--text3)" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-search"/></svg>
           <input type="text" id="msg-phone-search" placeholder="Filter by phone..." oninput="loadMessages()" style="background:none;border:none;outline:none;color:var(--text);font-size:13px;width:100%;">
         </div>
+        <input type="date" id="msg-date-filter" onchange="loadMessages()" style="padding:7px 10px;font-size:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);outline:none;cursor:pointer;">
         <button class="topbar-btn" onclick="clearChatHistory()" style="color:var(--danger);border-color:var(--danger);white-space:nowrap;">
           <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg>
           Clear History
@@ -949,7 +950,7 @@ textarea.form-input{resize:vertical;}
         <div class="card-body" style="padding:20px;display:flex;flex-direction:column;gap:16px;">
           <div class="form-group" style="margin:0">
             <label class="form-label">Provider</label>
-            <select class="form-input" id="ai-provider-select" onchange="onAiProviderChange(this.value)" style="cursor:pointer;">
+            <select class="form-input" id="ai-provider-select" style="cursor:pointer;">
               <option value="cerebras">Cerebras</option>
               <option value="groq">Groq</option>
               <option value="haiku">Claude Haiku</option>
@@ -2545,10 +2546,12 @@ async function loadMessages(){
   try{
     const clientId = document.getElementById('msg-client-filter')?.value || '';
     const phone = document.getElementById('msg-phone-search')?.value.trim() || '';
+    const dateFilter = document.getElementById('msg-date-filter')?.value || '';
     const opts = {select:'*', order:'created_at.desc', limit:100};
     if (clientId) opts.filter = {client_id:'eq.'+clientId};
     const data = await sb('message_logs', opts);
-    const filtered = phone ? data.filter(m=>(m.customer_phone||m.from_number||'').includes(phone)) : data;
+    let filtered = phone ? data.filter(m=>(m.customer_phone||m.from_number||'').includes(phone)) : data;
+    if (dateFilter) { filtered = filtered.filter(m => new Date(m.created_at).toISOString().slice(0,10) === dateFilter); }
 
     if (!filtered.length) {
       document.getElementById('messages-list').innerHTML='<div class="empty-state"><div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ic-msg"/></svg></div><div class="empty-state-text">No messages found</div></div>';
@@ -2755,13 +2758,15 @@ async function loadSettings(){
     const provider = s['ai_provider'] || 'cerebras';
     const sel = document.getElementById('ai-provider-select');
     // Set dropdown WITHOUT triggering onchange (prevent preset overwrite)
-    if (sel) { sel.onchange = null; sel.value = provider; sel.onchange = (e) => onAiProviderChange(e.target.value); }
+    if (sel) { sel.value = provider; }
     const badge = document.getElementById('ai-provider-badge');
     if (badge) badge.textContent = provider.toUpperCase();
     // Always use Supabase values — never fall back to presets
     if (document.getElementById('ai-endpoint-input')) document.getElementById('ai-endpoint-input').value = s['ai_endpoint'] || '';
     if (document.getElementById('ai-model-input')) document.getElementById('ai-model-input').value = s['ai_model'] || '';
     if (document.getElementById('ai-apikey-input')) document.getElementById('ai-apikey-input').value = s['ai_api_key'] || '';
+    // Attach onchange AFTER all values are set
+    if (sel) sel.onchange = (e) => onAiProviderChange(e.target.value);
     // Populate Admin Settings card (exclude AI rows)
     const filteredSettings = settings.filter(s => !aiKeys.includes(s.key));
     if(body) body.innerHTML=filteredSettings.length?filteredSettings.map(s=>`<div class="form-group"><label class="form-label">${s.key||s.setting_key||'Setting'}</label><input class="form-input" type="text" value="${s.value||s.setting_value||''}" onchange="updateSetting('${s.id}',this.value)"></div>`).join(''):'<div style="color:var(--text3);font-size:13px">No settings configured yet</div>';
