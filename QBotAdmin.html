@@ -145,7 +145,7 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
 /* FORM */
 .form-group{margin-bottom:16px;}
 .form-label{display:block;font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Courier New',Courier,monospace;text-transform:uppercase;letter-spacing:.5px;}
-.form-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;outline:none;transition:border-color .2s;}
+.form-input{width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-size:13.5px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;outline:none;transition:border-color .2s;min-width:0;box-sizing:border-box;overflow:hidden;text-overflow:ellipsis;}
 .form-input:focus{border-color:var(--accent);}
 select.form-input{cursor:pointer;}
 textarea.form-input{resize:vertical;}
@@ -510,6 +510,10 @@ textarea.form-input{resize:vertical;}
     <button class="nav-item" onclick="showPage('promos')">
       <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-tag"/></svg></span> Promos
     </button>
+    <button class="nav-item" onclick="showPage('orders')">
+      <span class="nav-icon"><svg viewBox="0 0 24 24"><use href="#ic-wa"/></svg></span> Orders
+      <span class="nav-badge red" id="badge-orders" style="display:none">0</span>
+    </button>
 
     <div class="nav-section-label">Bot</div>
     <button class="nav-item" onclick="showPage('products')">
@@ -728,6 +732,27 @@ textarea.form-input{resize:vertical;}
       <div id="promos-tbody"><div class="info-card-loading">Loading...</div></div>
     </div>
 
+    <!-- ORDERS -->
+    <div class="page" id="page-orders">
+      <div class="section-header">
+        <div><div class="section-title">Orders &amp; Bookings</div><div class="section-sub">All confirmed orders and bookings from bot</div></div>
+        <div class="inline-actions">
+          <select class="form-input" id="orders-client-filter" onchange="loadOrders()" style="width:180px;padding:7px 12px;font-size:13px;">
+            <option value="">All Clients</option>
+          </select>
+          <select class="form-input" id="orders-status-filter" onchange="loadOrders()" style="width:130px;padding:7px 12px;font-size:13px;">
+            <option value="">All Status</option>
+            <option value="new">New</option>
+            <option value="processing">Processing</option>
+            <option value="done">Done</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+      </div>
+      <div id="orders-stats" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:16px;"></div>
+      <div id="orders-tbody"><div class="info-card-loading">Loading...</div></div>
+    </div>
+
     <!-- PRODUCTS -->
     <div class="page" id="page-products">
       <div class="section-header">
@@ -821,7 +846,7 @@ textarea.form-input{resize:vertical;}
     </div>
 
     <!-- SETTINGS -->
-    <div class="page" id="page-settings">
+    <div class="page" id="page-settings" style="overflow-x:hidden;">
       <div class="section-header">
         <div><div class="section-title">Settings</div><div class="section-sub">Platform configuration</div></div>
       </div>
@@ -1210,6 +1235,20 @@ textarea.form-input{resize:vertical;}
   </div>
 </div>
 
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-overlay" id="modal-order-detail">
+  <div class="modal modal-wide">
+    <div class="modal-header">
+      <span class="modal-title" id="order-detail-title">Order Details</span>
+      <button class="modal-close" onclick="closeModal('modal-order-detail')">
+        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24"><use href="#ic-x"/></svg>
+      </button>
+    </div>
+    <div class="modal-body" id="order-detail-body" style="display:flex;flex-direction:column;gap:14px;"></div>
+    <div class="modal-footer" id="order-detail-footer"></div>
+  </div>
+</div>
+
 <!-- BOTTOM NAV (mobile) -->
 <nav class="bottom-nav" id="bottom-nav">
   <button class="bottom-nav-item active" onclick="showPage('dashboard')">
@@ -1220,9 +1259,9 @@ textarea.form-input{resize:vertical;}
     <svg viewBox="0 0 24 24"><use href="#ic-store"/></svg>
     <span>Clients</span>
   </button>
-  <button class="bottom-nav-item" onclick="showPage('products')">
-    <svg viewBox="0 0 24 24"><use href="#ic-package"/></svg>
-    <span>Products</span>
+  <button class="bottom-nav-item" onclick="showPage('orders')">
+    <svg viewBox="0 0 24 24"><use href="#ic-wa"/></svg>
+    <span>Orders</span>
   </button>
   <button class="bottom-nav-item" onclick="showPage('bot-controls')">
     <svg viewBox="0 0 24 24"><use href="#ic-bot"/></svg>
@@ -1570,11 +1609,11 @@ function showPage(page){
   document.getElementById('page-'+page).classList.add('active');
   const navBtn=document.querySelector(`.nav-item[onclick="showPage('${page}')"]`);
   if(navBtn)navBtn.classList.add('active');
-  const titles={dashboard:'Dashboard',clients:'Clients',subscriptions:'Subscriptions',payments:'Payments',plans:'Plans',promos:'Promos',products:'Products','bot-controls':'Bot Controls',messages:'Message Logs',notifications:'Notifications',audit:'Audit Logs',settings:'Settings',knowledge:'Knowledge Base'};
+  const titles={dashboard:'Dashboard',clients:'Clients',subscriptions:'Subscriptions',payments:'Payments',plans:'Plans',promos:'Promos',orders:'Orders & Bookings',products:'Products','bot-controls':'Bot Controls',messages:'Message Logs',notifications:'Notifications',audit:'Audit Logs',settings:'Settings',knowledge:'Knowledge Base'};
   document.getElementById('page-title').textContent=titles[page]||page;
   // Sync bottom nav
   document.querySelectorAll('.bottom-nav-item').forEach(b=>b.classList.remove('active'));
-  const bnMap={dashboard:0,clients:1,products:2,'bot-controls':3,messages:4};
+  const bnMap={dashboard:0,clients:1,orders:2,'bot-controls':3,messages:4};
   const bnItems=document.querySelectorAll('.bottom-nav-item');
   if(bnMap[page]!==undefined)bnItems[bnMap[page]]?.classList.add('active');
   // Mobile topbar action button context
@@ -1610,6 +1649,15 @@ function showPage(page){
     if (src && dst && dst.options.length <= 1) {
       dst.innerHTML = '<option value="">All Clients</option>' + Array.from(src.options).filter(o=>o.value).map(o=>`<option value="${o.value}">${o.text}</option>`).join('');
     }
+  }
+  // Populate orders client filter when navigating to orders page
+  if (page === 'orders') {
+    const src = document.getElementById('products-client-filter');
+    const dst = document.getElementById('orders-client-filter');
+    if (src && dst) {
+      dst.innerHTML = '<option value="">All Clients</option>' + Array.from(src.options).filter(o=>o.value).map(o=>`<option value="${o.value}">${o.text}</option>`).join('');
+    }
+    loadOrders();
   }
 }
 
@@ -1910,6 +1958,14 @@ async function deleteProduct(id) {
 async function loadAllData(){
   document.getElementById('last-sync').textContent='Syncing...';
   await Promise.allSettled([loadDashboard(),loadClients(),loadSubscriptions(),loadPayments(),loadPlans(),loadPromos(),loadBotControls(),loadMessages(),loadNotifications(),loadAuditLogs(),loadSettings()]);
+  try {
+    const newOrders = await sb('orders', { select: 'id', filter: { status: 'eq.new' } });
+    const badge = document.getElementById('badge-orders');
+    if (badge) {
+      if (newOrders.length > 0) { badge.textContent = newOrders.length; badge.style.display = ''; }
+      else { badge.style.display = 'none'; }
+    }
+  } catch(e) {}
   document.getElementById('last-sync').textContent='Synced '+new Date().toLocaleTimeString('en-MY');
 }
 
@@ -2698,11 +2754,13 @@ async function loadSettings(){
     settings.filter(r => aiKeys.includes(r.key)).forEach(r => s[r.key] = r.value);
     const provider = s['ai_provider'] || 'cerebras';
     const sel = document.getElementById('ai-provider-select');
-    if (sel) sel.value = provider;
+    // Set dropdown WITHOUT triggering onchange (prevent preset overwrite)
+    if (sel) { sel.onchange = null; sel.value = provider; sel.onchange = (e) => onAiProviderChange(e.target.value); }
     const badge = document.getElementById('ai-provider-badge');
     if (badge) badge.textContent = provider.toUpperCase();
-    if (document.getElementById('ai-endpoint-input')) document.getElementById('ai-endpoint-input').value = s['ai_endpoint'] || AI_PRESETS[provider]?.endpoint || '';
-    if (document.getElementById('ai-model-input')) document.getElementById('ai-model-input').value = s['ai_model'] || AI_PRESETS[provider]?.model || '';
+    // Always use Supabase values — never fall back to presets
+    if (document.getElementById('ai-endpoint-input')) document.getElementById('ai-endpoint-input').value = s['ai_endpoint'] || '';
+    if (document.getElementById('ai-model-input')) document.getElementById('ai-model-input').value = s['ai_model'] || '';
     if (document.getElementById('ai-apikey-input')) document.getElementById('ai-apikey-input').value = s['ai_api_key'] || '';
     // Populate Admin Settings card (exclude AI rows)
     const filteredSettings = settings.filter(s => !aiKeys.includes(s.key));
@@ -3234,6 +3292,130 @@ async function saveKnowledge(clientId, existingId) {
     toast('Knowledge base saved', 'success');
     loadKnowledge();
   } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+// ORDERS
+async function loadOrders() {
+  const clientFilter = document.getElementById('orders-client-filter')?.value || '';
+  const statusFilter = document.getElementById('orders-status-filter')?.value || '';
+  const el = document.getElementById('orders-tbody');
+  el.innerHTML = '<div class="info-card-loading">Loading...</div>';
+  try {
+    const filterParams = {};
+    if (clientFilter) filterParams['client_id'] = 'eq.' + clientFilter;
+    if (statusFilter) filterParams['status'] = 'eq.' + statusFilter;
+    const [orders, clients] = await Promise.all([
+      sb('orders', { select: '*', order: 'created_at.desc', filter: Object.keys(filterParams).length ? filterParams : undefined }),
+      sb('clients', { select: 'id,business_name' })
+    ]);
+    const clientMap = {};
+    clients.forEach(c => { clientMap[c.id] = c.business_name; });
+    const total = orders.length;
+    const newCount = orders.filter(o => o.status === 'new').length;
+    const processingCount = orders.filter(o => o.status === 'processing').length;
+    const doneCount = orders.filter(o => o.status === 'done').length;
+    document.getElementById('orders-stats').innerHTML = `
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:var(--text)">${total}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">TOTAL</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--danger);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:var(--danger)">${newCount}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">NEW</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid #f59e0b;border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:#f59e0b">${processingCount}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">PROCESSING</div>
+      </div>
+      <div style="background:var(--bg2);border:1px solid var(--accent);border-radius:10px;padding:14px;text-align:center">
+        <div style="font-size:22px;font-weight:700;color:var(--accent)">${doneCount}</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">DONE</div>
+      </div>`;
+    const badge = document.getElementById('badge-orders');
+    if (badge) { if (newCount > 0) { badge.textContent = newCount; badge.style.display = ''; } else { badge.style.display = 'none'; } }
+    if (!orders.length) { el.innerHTML = '<div class="info-card-empty">No orders yet. Orders will appear here when customers confirm via bot.</div>'; return; }
+    el.innerHTML = orders.map(o => {
+      const clientName = clientMap[o.client_id] || shortId(o.client_id);
+      let statusBadgeHtml = '';
+      if (o.status === 'new') statusBadgeHtml = '<span class="badge badge-red">NEW</span>';
+      else if (o.status === 'processing') statusBadgeHtml = '<span class="badge badge-yellow">PROCESSING</span>';
+      else if (o.status === 'done') statusBadgeHtml = '<span class="badge badge-green">DONE</span>';
+      else if (o.status === 'cancelled') statusBadgeHtml = '<span class="badge badge-grey">CANCELLED</span>';
+      else statusBadgeHtml = `<span class="badge badge-grey">${o.status||'—'}</span>`;
+      const details = o.order_details || o.raw_order || '—';
+      const detailsShort = details.length > 120 ? details.substring(0, 120) + '…' : details;
+      return `<div class="info-card" style="${o.status==='new'?'border-color:var(--danger);':''}">
+        <div class="info-card-top">
+          <div>
+            <div class="info-card-id">${clientName}</div>
+            <div class="info-card-sub">${o.customer_phone||'—'}${o.customer_name?' · '+o.customer_name:''}</div>
+          </div>
+          ${statusBadgeHtml}
+        </div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:8px;line-height:1.6;white-space:pre-wrap;background:var(--bg3);border-radius:6px;padding:8px 10px;">${detailsShort}</div>
+        <div class="info-card-row">
+          ${o.total_amount?`<span class="info-card-label">Amount</span><span style="color:var(--accent);font-weight:600">RM ${parseFloat(o.total_amount).toFixed(2)}</span>`:'<span></span><span></span>'}
+          <span class="info-card-label">Received</span><span>${fmtDT(o.created_at)}</span>
+        </div>
+        <div class="info-card-actions" style="flex-wrap:wrap;">
+          <button class="action-btn" onclick="openOrderDetail('${o.id}')">View Details</button>
+          ${o.status==='new'?`<button class="action-btn" style="border-color:#f59e0b;color:#f59e0b;" onclick="updateOrderStatus('${o.id}','processing')">Mark Processing</button>`:''}
+          ${o.status==='processing'?`<button class="action-btn" style="border-color:var(--accent);color:var(--accent);" onclick="updateOrderStatus('${o.id}','done')">Mark Done</button>`:''}
+          ${o.status!=='done'&&o.status!=='cancelled'?`<button class="action-btn danger" onclick="updateOrderStatus('${o.id}','cancelled')">Cancel</button>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  } catch(e) { el.innerHTML = `<div class="info-card-empty" style="color:var(--danger)">Error: ${e.message}</div>`; }
+}
+
+async function updateOrderStatus(id, status) {
+  try {
+    await sbPatch('orders', id, { status, updated_at: new Date().toISOString() });
+    const labels = { processing:'Processing', done:'Done', cancelled:'Cancelled' };
+    toast('Order marked as ' + (labels[status]||status), 'success');
+    loadOrders();
+  } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+
+async function openOrderDetail(id) {
+  const body = document.getElementById('order-detail-body');
+  const footer = document.getElementById('order-detail-footer');
+  body.innerHTML = '<div style="color:var(--text3);font-size:13px;text-align:center;padding:20px">Loading...</div>';
+  openModal('modal-order-detail');
+  try {
+    const orders = await sb('orders', { select: '*', filter: { id: 'eq.' + id } });
+    const o = orders[0];
+    if (!o) { body.innerHTML = '<div style="color:var(--danger)">Order not found</div>'; return; }
+    const clients = await sb('clients', { select: 'id,business_name', filter: { id: 'eq.' + o.client_id } });
+    const clientName = clients[0]?.business_name || shortId(o.client_id);
+    document.getElementById('order-detail-title').textContent = 'Order — ' + clientName;
+    let statusBadgeHtml = '';
+    if (o.status==='new') statusBadgeHtml='<span class="badge badge-red">NEW</span>';
+    else if (o.status==='processing') statusBadgeHtml='<span class="badge badge-yellow">PROCESSING</span>';
+    else if (o.status==='done') statusBadgeHtml='<span class="badge badge-green">DONE</span>';
+    else statusBadgeHtml=`<span class="badge badge-grey">${o.status||'—'}</span>`;
+    body.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:11px;font-family:'Courier New',Courier,monospace;color:var(--text3)">ID: ${o.id}</div>
+        ${statusBadgeHtml}
+      </div>
+      <div style="background:var(--bg3);border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:8px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Client</span><span style="font-weight:600">${clientName}</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Customer Phone</span><span style="font-family:'Courier New',Courier,monospace">${o.customer_phone||'—'}</span></div>
+        ${o.customer_name?`<div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Customer Name</span><span>${o.customer_name}</span></div>`:''}
+        ${o.total_amount?`<div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Amount</span><span style="color:var(--accent);font-weight:700">RM ${parseFloat(o.total_amount).toFixed(2)}</span></div>`:''}
+        ${o.payment_method?`<div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Payment</span><span>${o.payment_method}</span></div>`:''}
+        ${o.delivery_type?`<div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Type</span><span>${o.delivery_type}</span></div>`:''}
+        ${o.address?`<div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Address</span><span style="text-align:right;max-width:200px">${o.address}</span></div>`:''}
+        <div style="display:flex;justify-content:space-between;font-size:12px;"><span style="color:var(--text3)">Received</span><span>${fmtDT(o.created_at)}</span></div>
+      </div>
+      ${o.order_details?`<div><div style="font-size:11px;font-family:'Courier New',Courier,monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Order Details</div><div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:13px;color:var(--text2);white-space:pre-wrap;line-height:1.7;">${o.order_details}</div></div>`:''}
+      ${o.raw_order?`<div><div style="font-size:11px;font-family:'Courier New',Courier,monospace;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;">Raw Bot Message</div><div style="background:var(--bg3);border-radius:8px;padding:12px;font-size:12px;color:var(--text3);white-space:pre-wrap;line-height:1.6;">${o.raw_order}</div></div>`:''}`;
+    footer.innerHTML = `
+      <button class="topbar-btn" onclick="closeModal('modal-order-detail')">Close</button>
+      ${o.status==='new'?`<button class="topbar-btn" style="border-color:#f59e0b;color:#f59e0b;" onclick="updateOrderStatus('${o.id}','processing');closeModal('modal-order-detail')">Mark Processing</button>`:''}
+      ${o.status==='processing'?`<button class="topbar-btn btn-primary" onclick="updateOrderStatus('${o.id}','done');closeModal('modal-order-detail')">Mark Done</button>`:''}
+      ${o.status!=='done'&&o.status!=='cancelled'?`<button class="topbar-btn" style="border-color:var(--danger);color:var(--danger);" onclick="updateOrderStatus('${o.id}','cancelled');closeModal('modal-order-detail')">Cancel Order</button>`:''}`;
+  } catch(e) { body.innerHTML = `<div style="color:var(--danger)">Error: ${e.message}</div>`; }
 }
 
 
