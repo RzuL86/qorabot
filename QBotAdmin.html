@@ -947,7 +947,7 @@ textarea.form-input{resize:vertical;}
           <div class="form-group">
             <label class="form-label">Cerebras API Key</label>
             <div style="position:relative;">
-              <input class="form-input" type="password" id="cerebras-key-input" placeholder="csk_..." style="font-family:'Courier New',Courier,monospace;padding-right:38px;">
+              <input class="form-input" type="password" id="cerebras-key-input" placeholder="csk-..." style="font-family:'Courier New',Courier,monospace;padding-right:38px;">
               <button type="button" onclick="togglePwField('cerebras-key-input','cerebras-key-eye')" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;align-items:center;padding:4px;">
                 <svg id="cerebras-key-eye" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><use href="#ic-eye"/></svg>
               </button>
@@ -2705,8 +2705,8 @@ function clearHaikuKey() {
 function saveCerebrasKey() {
   const val = document.getElementById('cerebras-key-input').value.trim();
   const st = document.getElementById('cerebras-key-status');
-  if (!val.startsWith('csk_')) {
-    st.style.display='block'; st.style.color='var(--danger)'; st.textContent='Key must start with csk_'; return;
+  if (!val.startsWith('csk-')) {
+    st.style.display='block'; st.style.color='var(--danger)'; st.textContent='Key must start with csk-'; return;
   }
   localStorage.setItem('wabot_cerebras_key', val);
   st.style.display='block'; st.style.color='var(--accent)'; st.textContent='Key saved';
