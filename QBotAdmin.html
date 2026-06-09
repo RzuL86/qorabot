@@ -2761,10 +2761,10 @@ async function saveAiProvider() {
   try {
     // Use upsert on key column — works whether rows exist or not
     const updates = [
-      { key: 'ai_provider', value: provider, description: 'AI provider setting' },
-      { key: 'ai_endpoint', value: endpoint, description: 'AI provider setting' },
-      { key: 'ai_model', value: model, description: 'AI provider setting' },
-      { key: 'ai_api_key', value: apiKey, description: 'AI provider setting' }
+      { key: 'ai_provider', value: provider },
+      { key: 'ai_endpoint', value: endpoint },
+      { key: 'ai_model', value: model },
+      { key: 'ai_api_key', value: apiKey }
     ];
     const r = await fetch(`${SUPABASE_URL}/rest/v1/admin_settings`, {
       method: 'POST',
