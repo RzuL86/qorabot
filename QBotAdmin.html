@@ -1722,8 +1722,10 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 
 // FORMATTERS
-function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'});}
-function fmtDT(d){if(!d)return'—';return new Date(d).toLocaleString('en-MY',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kuala_Lumpur'});}
+function toMYT(d){return new Date(new Date(d).getTime()+8*60*60*1000);}
+function fmtTime(d){if(!d)return'—';const m=toMYT(d);const h=m.getUTCHours();const min=String(m.getUTCMinutes()).padStart(2,'0');const ap=h>=12?'pm':'am';return(h%12||12)+':'+min+' '+ap;}
+function fmtDate(d){if(!d)return'—';const m=toMYT(d);const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return String(m.getUTCDate()).padStart(2,'0')+' '+months[m.getUTCMonth()]+' '+m.getUTCFullYear();}
+function fmtDT(d){if(!d)return'—';const m=toMYT(d);const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const h=m.getUTCHours();const min=String(m.getUTCMinutes()).padStart(2,'0');const ampm=h>=12?'pm':'am';const h12=h%12||12;return String(m.getUTCDate()).padStart(2,'0')+' '+months[m.getUTCMonth()]+', '+h12+':'+min+' '+ampm;}
 function statusBadge(a,t='Active',f='Inactive'){return a?`<span class="badge badge-green">${t}</span>`:`<span class="badge badge-red">${f}</span>`;}
 function shortId(id){return id?id.substring(0,8)+'...':'—';}
 
@@ -2581,8 +2583,10 @@ async function loadMessages(){
     // Group by date
     const groups = {};
     filtered.forEach(m => {
-      const d = new Date(new Date(m.created_at).getTime() + 8*60*60*1000);
-      const dateKey = d.toLocaleDateString('en-MY', {weekday:'short', day:'2-digit', month:'short', year:'numeric', timeZone:'Asia/Kuala_Lumpur'});
+      const d = toMYT(m.created_at);
+      const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const days=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      const dateKey = days[d.getUTCDay()]+', '+String(d.getUTCDate()).padStart(2,'0')+' '+months[d.getUTCMonth()]+' '+d.getUTCFullYear();
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(m);
     });
@@ -2592,7 +2596,7 @@ async function loadMessages(){
       html += `<div class="log-date-group">${dateKey}</div>`;
       html += groups[dateKey].map(m=>`
       <div class="log-entry">
-        <div class="log-time">${new Date(m.created_at).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kuala_Lumpur'})}</div>
+        <div class="log-time">${fmtTime(m.created_at)}</div>
         <div style="flex:1;min-width:0;">
           <div class="log-phone">${m.customer_phone||m.from_number||'—'}</div>
           <div class="log-msg">${m.message_in||m.customer_message||m.message||'—'}</div>
