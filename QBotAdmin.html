@@ -1722,8 +1722,8 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 
 // FORMATTERS
-function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'numeric'});}
-function fmtDT(d){if(!d)return'—';return new Date(d).toLocaleString('en-MY',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});}
+function fmtDate(d){if(!d)return'—';return new Date(d).toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'numeric',timeZone:'Asia/Kuala_Lumpur'});}
+function fmtDT(d){if(!d)return'—';return new Date(d).toLocaleString('en-MY',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kuala_Lumpur'});}
 function statusBadge(a,t='Active',f='Inactive'){return a?`<span class="badge badge-green">${t}</span>`:`<span class="badge badge-red">${f}</span>`;}
 function shortId(id){return id?id.substring(0,8)+'...':'—';}
 
@@ -2571,7 +2571,7 @@ async function loadMessages(){
     if (clientId) opts.filter = {client_id:'eq.'+clientId};
     const data = await sb('message_logs', opts);
     let filtered = phone ? data.filter(m=>(m.customer_phone||m.from_number||'').includes(phone)) : data;
-    if (dateFilter) { filtered = filtered.filter(m => new Date(m.created_at).toISOString().slice(0,10) === dateFilter); }
+    if (dateFilter) { filtered = filtered.filter(m => { const d = new Date(new Date(m.created_at).getTime() + 8*60*60*1000); return d.toISOString().slice(0,10) === dateFilter; }); }
 
     if (!filtered.length) {
       document.getElementById('messages-list').innerHTML='<div class="empty-state"><div class="empty-state-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#ic-msg"/></svg></div><div class="empty-state-text">No messages found</div></div>';
@@ -2581,8 +2581,8 @@ async function loadMessages(){
     // Group by date
     const groups = {};
     filtered.forEach(m => {
-      const d = new Date(m.created_at);
-      const dateKey = d.toLocaleDateString('en-MY', {weekday:'short', day:'2-digit', month:'short', year:'numeric'});
+      const d = new Date(new Date(m.created_at).getTime() + 8*60*60*1000);
+      const dateKey = d.toLocaleDateString('en-MY', {weekday:'short', day:'2-digit', month:'short', year:'numeric', timeZone:'Asia/Kuala_Lumpur'});
       if (!groups[dateKey]) groups[dateKey] = [];
       groups[dateKey].push(m);
     });
@@ -2592,7 +2592,7 @@ async function loadMessages(){
       html += `<div class="log-date-group">${dateKey}</div>`;
       html += groups[dateKey].map(m=>`
       <div class="log-entry">
-        <div class="log-time">${new Date(m.created_at).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit'})}</div>
+        <div class="log-time">${new Date(m.created_at).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',timeZone:'Asia/Kuala_Lumpur'})}</div>
         <div style="flex:1;min-width:0;">
           <div class="log-phone">${m.customer_phone||m.from_number||'—'}</div>
           <div class="log-msg">${m.message_in||m.customer_message||m.message||'—'}</div>
