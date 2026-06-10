@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>WaBotMY — Admin</title>
+<!-- QBotAdmin EP39 | GMT+8 fix | 2026-06-10 -->
 <style>
 /* System font fallbacks — no Google Fonts needed (APK offline) */
 </style>
@@ -1722,7 +1723,7 @@ function closeModal(id){document.getElementById(id).classList.remove('open');}
 document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 
 // FORMATTERS
-function toMYT(d){return new Date(new Date(d).getTime()+8*60*60*1000);}
+function toMYT(d){if(!d)return new Date();const s=String(d);const utc=s.endsWith('Z')||s.includes('+')?s:s+'+00:00';return new Date(new Date(utc).getTime()+8*60*60*1000);}
 function fmtTime(d){if(!d)return'—';const m=toMYT(d);const h=m.getUTCHours();const min=String(m.getUTCMinutes()).padStart(2,'0');const ap=h>=12?'pm':'am';return(h%12||12)+':'+min+' '+ap;}
 function fmtDate(d){if(!d)return'—';const m=toMYT(d);const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return String(m.getUTCDate()).padStart(2,'0')+' '+months[m.getUTCMonth()]+' '+m.getUTCFullYear();}
 function fmtDT(d){if(!d)return'—';const m=toMYT(d);const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];const h=m.getUTCHours();const min=String(m.getUTCMinutes()).padStart(2,'0');const ampm=h>=12?'pm':'am';const h12=h%12||12;return String(m.getUTCDate()).padStart(2,'0')+' '+months[m.getUTCMonth()]+', '+h12+':'+min+' '+ampm;}
