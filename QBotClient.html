@@ -509,7 +509,7 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
 
       <div class="fl">
         <label class="fl-label">Phone Number</label>
-        <input id="login-phone" class="fl-input" type="tel" placeholder="01164343502" autocomplete="tel">
+        <input id="login-phone" class="fl-input" type="tel" placeholder="0188888888" autocomplete="tel">
       </div>
       <div class="fl">
         <label class="fl-label">Password</label>
@@ -965,7 +965,7 @@ async function tryLogin(){
     if(!rows || rows.length === 0) throw new Error('not found');
     const client = rows[0];
     // Password check: custom portal_password (if set) takes priority,
-    // otherwise fallback = last 6 digits of owner_phone (e.g. 01164343502 → 343502)
+    // otherwise fallback = last 6 digits of owner_phone (e.g. 0188888888 → 888888)
     if(client.portal_password){
       if(pw !== client.portal_password) throw new Error('wrong');
     } else {
