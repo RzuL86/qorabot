@@ -1,0 +1,1432 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QBotMY — Client Portal</title>
+<!-- QBotClient EP41 | Qoratech | 2026-06-14 -->
+<style>
+:root {
+  --accent: #25D366;
+  --accent2: #128C7E;
+  --accent-dim: rgba(37,211,102,.12);
+  --accent-border: rgba(37,211,102,.25);
+  --danger: #ef4444;
+  --warning: #f59e0b;
+  --info: #3b82f6;
+  --bg: #0a0d0f;
+  --bg2: #111518;
+  --bg3: #181d22;
+  --bg4: #1f262d;
+  --border: #252d35;
+  --border2: #2e3840;
+  --text: #e8edf2;
+  --text2: #8b97a4;
+  --text3: #5a6670;
+  --shadow: 0 1px 3px rgba(0,0,0,.5), 0 4px 16px rgba(0,0,0,.3);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.5);
+}
+[data-theme="light"] {
+  --bg: #f0f4f8; --bg2: #ffffff; --bg3: #f8fafc; --bg4: #edf2f7;
+  --border: #d1dbe6; --border2: #b8c9d8;
+  --text: #0f1923; --text2: #4a5a6a; --text3: #8a9aaa;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 4px 16px rgba(0,0,0,.06);
+  --shadow-lg: 0 20px 60px rgba(0,0,0,.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+
+/* ── SVG SPRITE ── */
+.ic{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;}
+.ic svg{width:100%;height:100%;}
+
+/* ══════════════════════════════════════════
+   LOGIN SCREEN
+══════════════════════════════════════════ */
+#login-screen{
+  position:fixed;inset:0;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;
+}
+.login-wrap{
+  width:360px;max-width:94vw;
+}
+.login-brand{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:36px;
+}
+.login-logo{
+  width:42px;height:42px;
+  background:linear-gradient(135deg,var(--accent),var(--accent2));
+  border-radius:12px;
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.login-logo svg{width:22px;height:22px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.login-name{font-weight:800;font-size:18px;letter-spacing:-.3px;}
+.login-sub{font-size:10px;color:var(--text3);font-family:'Courier New',monospace;letter-spacing:.8px;margin-top:2px;}
+
+.login-card{
+  background:var(--bg2);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:28px 24px;
+  box-shadow:var(--shadow-lg);
+}
+.login-heading{font-size:15px;font-weight:700;margin-bottom:4px;}
+.login-hint{font-size:12px;color:var(--text3);margin-bottom:24px;line-height:1.5;}
+
+.fl{margin-bottom:16px;}
+.fl-label{display:block;font-size:10px;font-weight:600;color:var(--text2);margin-bottom:6px;font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:.6px;}
+.fl-input{
+  width:100%;padding:10px 12px;
+  background:var(--bg3);
+  border:1px solid var(--border2);
+  border-radius:8px;
+  color:var(--text);font-size:14px;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  outline:none;transition:border-color .2s;
+}
+.fl-input:focus{border-color:var(--accent);}
+.fl-input::placeholder{color:var(--text3);}
+
+#login-error{
+  display:none;
+  color:var(--danger);font-size:12px;
+  margin-bottom:14px;
+  padding:10px 12px;
+  background:rgba(239,68,68,.08);
+  border:1px solid rgba(239,68,68,.2);
+  border-radius:8px;
+}
+.btn-login{
+  width:100%;padding:11px;
+  background:var(--accent);color:#000;
+  border:none;border-radius:9px;
+  font-size:14px;font-weight:700;
+  cursor:pointer;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  transition:background .15s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.btn-login:hover{background:#1db954;}
+.btn-login:active{transform:scale(.98);}
+.btn-login:disabled{opacity:.5;cursor:not-allowed;}
+
+.login-footer{margin-top:20px;text-align:center;font-size:12px;color:var(--text3);}
+.login-footer a{color:var(--accent);text-decoration:none;}
+
+/* ══════════════════════════════════════════
+   APP SHELL
+══════════════════════════════════════════ */
+#app{display:none;min-height:100vh;}
+
+/* TOPBAR */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  background:var(--bg2);
+  border-bottom:1px solid var(--border);
+  padding:0 20px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.topbar-left{display:flex;align-items:center;gap:12px;}
+.tb-logo{width:30px;height:30px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;}
+.tb-logo svg{width:16px;height:16px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.tb-title{font-weight:800;font-size:14px;letter-spacing:-.2px;}
+.tb-badge{font-size:9px;color:var(--text3);font-family:'Courier New',monospace;letter-spacing:.6px;}
+.tb-divider{width:1px;height:20px;background:var(--border);margin:0 4px;}
+.tb-client-name{font-size:13px;font-weight:600;color:var(--text2);max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.status-dot{width:7px;height:7px;background:var(--accent);border-radius:50%;box-shadow:0 0 0 3px rgba(37,211,102,.2);animation:pulse 2s infinite;flex-shrink:0;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(37,211,102,.2);}50%{box-shadow:0 0 0 6px rgba(37,211,102,.08);}}
+
+.icon-btn{
+  width:34px;height:34px;
+  border-radius:8px;
+  border:1px solid var(--border2);
+  background:var(--bg3);
+  color:var(--text2);
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .15s;
+}
+.icon-btn:hover{border-color:var(--accent);color:var(--accent);}
+.icon-btn svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+
+/* BOTTOM NAV (mobile) */
+.bottom-nav{
+  display:none;
+  position:fixed;bottom:0;left:0;right:0;z-index:101;
+  background:var(--bg2);border-top:1px solid var(--border);
+  padding:6px 4px calc(6px + env(safe-area-inset-bottom));
+  justify-content:space-around;align-items:center;
+}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:5px 10px;border-radius:8px;
+  cursor:pointer;border:none;background:none;
+  color:var(--text3);transition:color .15s;min-width:48px;
+}
+.bn-item svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;}
+.bn-item.active{color:var(--accent);}
+.bn-item span{font-size:9px;font-weight:700;font-family:'Courier New',monospace;letter-spacing:.2px;}
+
+/* MAIN CONTENT */
+.main{padding:20px;max-width:720px;margin:0 auto;padding-bottom:90px;}
+
+/* PAGE TRANSITIONS */
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .22s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+/* SECTION HEADER */
+.sh{margin-bottom:18px;}
+.sh-title{font-size:18px;font-weight:800;margin-bottom:3px;}
+.sh-sub{font-size:12px;color:var(--text3);}
+
+/* ── STAT CARDS ── */
+.stats-row{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+.stat-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;
+  box-shadow:var(--shadow);
+}
+.stat-label{font-size:10px;color:var(--text3);font-family:'Courier New',monospace;letter-spacing:.6px;text-transform:uppercase;margin-bottom:8px;}
+.stat-value{font-size:26px;font-weight:800;line-height:1;margin-bottom:4px;}
+.stat-value.green{color:var(--accent);}
+.stat-value.blue{color:var(--info);}
+.stat-value.yellow{color:var(--warning);}
+.stat-value.red{color:var(--danger);}
+.stat-delta{font-size:11px;color:var(--text3);display:flex;align-items:center;gap:4px;}
+.stat-delta.up{color:var(--accent);}
+
+/* ── BOT STATUS CARD ── */
+.bot-status-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:14px;padding:18px 20px;
+  box-shadow:var(--shadow);
+  margin-bottom:20px;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+}
+.bsc-left{display:flex;align-items:center;gap:14px;}
+.bsc-avatar{
+  width:46px;height:46px;
+  background:linear-gradient(135deg,var(--accent2),var(--accent));
+  border-radius:13px;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;
+}
+.bsc-avatar.paused{background:linear-gradient(135deg,#4b5563,#374151);}
+.bsc-avatar svg{width:22px;height:22px;stroke:#000;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.bsc-name{font-weight:700;font-size:15px;margin-bottom:3px;}
+.bsc-cat{font-size:11px;color:var(--text3);margin-bottom:5px;}
+.status-pill{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:3px 9px;border-radius:20px;
+  font-size:10px;font-weight:700;font-family:'Courier New',monospace;
+  letter-spacing:.3px;
+}
+.status-pill.running{background:rgba(37,211,102,.13);color:var(--accent);border:1px solid rgba(37,211,102,.2);}
+.status-pill.paused{background:rgba(239,68,68,.1);color:var(--danger);border:1px solid rgba(239,68,68,.2);}
+.status-pill-dot{width:5px;height:5px;border-radius:50%;background:currentColor;}
+
+/* Power toggle */
+.power-btn{
+  width:50px;height:50px;border-radius:50%;
+  border:2px solid var(--border2);background:var(--bg3);
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .25s;
+}
+.power-btn.on{border-color:var(--accent);background:rgba(37,211,102,.1);box-shadow:0 0 0 4px rgba(37,211,102,.08);}
+.power-btn.off{border-color:var(--danger);background:rgba(239,68,68,.07);}
+.power-btn svg{width:20px;height:20px;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;transition:stroke .2s;}
+.power-btn.on svg{stroke:var(--accent);}
+.power-btn.off svg{stroke:var(--danger);}
+
+/* ── CARD BASE ── */
+.card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:13px;box-shadow:var(--shadow);
+  margin-bottom:14px;overflow:hidden;
+}
+.card-head{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.card-head-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.card-head-title svg{width:15px;height:15px;fill:none;stroke:var(--accent);stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.card-body{padding:16px 18px;}
+
+/* ── ORDER CARDS ── */
+.order-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:12px;padding:14px 16px;
+  margin-bottom:10px;
+  box-shadow:var(--shadow);
+  transition:border-color .15s;
+}
+.order-card:hover{border-color:var(--border2);}
+.order-card:last-child{margin-bottom:0;}
+.order-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px;}
+.order-id{font-family:'Courier New',monospace;font-size:11px;color:var(--text3);margin-bottom:3px;}
+.order-customer{font-weight:700;font-size:14px;margin-bottom:2px;}
+.order-time{font-size:11px;color:var(--text3);}
+.order-amount{font-family:'Courier New',monospace;font-size:18px;font-weight:700;color:var(--accent);text-align:right;}
+.order-items{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:10px;padding:10px;background:var(--bg3);border-radius:8px;border:1px solid var(--border);}
+.order-meta{display:flex;flex-wrap:wrap;gap:6px;}
+.order-tag{
+  font-size:10px;font-weight:600;font-family:'Courier New',monospace;
+  padding:3px 8px;border-radius:20px;
+}
+.order-tag.delivery{background:rgba(59,130,246,.12);color:var(--info);border:1px solid rgba(59,130,246,.2);}
+.order-tag.pickup{background:rgba(245,158,11,.1);color:var(--warning);border:1px solid rgba(245,158,11,.2);}
+.order-tag.cash{background:var(--bg3);color:var(--text2);border:1px solid var(--border);}
+.order-tag.transfer{background:rgba(37,211,102,.1);color:var(--accent);border:1px solid rgba(37,211,102,.18);}
+
+/* STATUS BADGE */
+.badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:700;font-family:'Courier New',monospace;}
+.badge-new{background:rgba(239,68,68,.12);color:var(--danger);border:1px solid rgba(239,68,68,.2);}
+.badge-processing{background:rgba(245,158,11,.1);color:var(--warning);border:1px solid rgba(245,158,11,.2);}
+.badge-done{background:rgba(37,211,102,.12);color:var(--accent);border:1px solid rgba(37,211,102,.2);}
+.badge-cancelled{background:var(--bg3);color:var(--text3);border:1px solid var(--border);}
+
+/* ORDER STATUS ACTIONS */
+.order-actions{display:flex;gap:8px;margin-top:12px;padding-top:10px;border-top:1px solid var(--border);}
+.action-btn{
+  padding:5px 12px;border-radius:7px;font-size:11px;font-weight:600;
+  cursor:pointer;border:1px solid var(--border2);
+  background:var(--bg3);color:var(--text2);
+  transition:all .15s;
+  font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+}
+.action-btn:hover{border-color:var(--accent);color:var(--accent);}
+.action-btn.primary{background:var(--accent);color:#000;border-color:var(--accent);}
+.action-btn.primary:hover{background:#1db954;}
+.action-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ── MESSAGE LOG ── */
+.msg-filter{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.msg-filter::-webkit-scrollbar{display:none;}
+.filter-chip{
+  padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;
+  border:1px solid var(--border2);background:var(--bg3);color:var(--text2);
+  cursor:pointer;white-space:nowrap;transition:all .15s;
+  font-family:'Courier New',monospace;
+}
+.filter-chip.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border);}
+
+.log-entry{
+  padding:12px 14px;border-bottom:1px solid var(--border);
+  transition:background .15s;
+}
+.log-entry:hover{background:var(--bg3);}
+.log-entry:last-child{border-bottom:none;}
+.log-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.log-phone{font-family:'Courier New',monospace;font-size:11px;color:var(--accent);font-weight:600;}
+.log-time{font-family:'Courier New',monospace;font-size:10px;color:var(--text3);}
+.log-in{font-size:13px;color:var(--text);line-height:1.5;margin-bottom:4px;word-break:break-word;}
+.log-out{font-size:12px;color:var(--text3);line-height:1.5;font-style:italic;padding:8px 10px;background:var(--bg3);border-radius:7px;border-left:2px solid var(--border2);margin-top:6px;word-break:break-word;}
+.log-date-sep{padding:6px 14px;background:var(--bg4);font-size:10px;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;border-bottom:1px solid var(--border);position:sticky;top:56px;z-index:1;}
+
+/* ── SUBSCRIPTION / PLAN CARD ── */
+.plan-display{
+  background:linear-gradient(135deg,rgba(37,211,102,.06),rgba(18,140,126,.04));
+  border:1px solid rgba(37,211,102,.18);
+  border-radius:14px;padding:20px;
+  margin-bottom:14px;
+}
+.plan-tier{font-size:10px;font-weight:700;color:var(--accent);font-family:'Courier New',monospace;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;}
+.plan-name{font-size:20px;font-weight:800;margin-bottom:4px;}
+.plan-price{font-family:'Courier New',monospace;font-size:13px;color:var(--text2);margin-bottom:16px;}
+.plan-meta-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.plan-meta-item{background:var(--bg3);border-radius:9px;padding:11px 12px;border:1px solid var(--border);}
+.plan-meta-label{font-size:10px;color:var(--text3);font-family:'Courier New',monospace;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.plan-meta-val{font-size:13px;font-weight:700;}
+.plan-meta-val.green{color:var(--accent);}
+
+/* Usage bar */
+.usage-wrap{margin-top:14px;}
+.usage-label-row{display:flex;justify-content:space-between;margin-bottom:6px;}
+.usage-label{font-size:11px;color:var(--text2);}
+.usage-count{font-size:11px;font-family:'Courier New',monospace;color:var(--text3);}
+.usage-bar{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden;}
+.usage-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--accent));border-radius:3px;transition:width 1s ease;}
+.usage-fill.warn{background:linear-gradient(90deg,#d97706,var(--warning));}
+.usage-fill.danger{background:linear-gradient(90deg,#dc2626,var(--danger));}
+
+/* ── SETTINGS ITEMS ── */
+.setting-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 0;border-bottom:1px solid var(--border);gap:12px;
+}
+.setting-row:last-child{border-bottom:none;}
+.setting-label{font-size:13px;font-weight:500;}
+.setting-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.toggle-switch{position:relative;width:40px;height:22px;display:inline-block;flex-shrink:0;}
+.toggle-switch input{display:none;}
+.toggle-slider{position:absolute;inset:0;background:var(--border2);border-radius:11px;cursor:pointer;transition:.25s;}
+.toggle-slider::after{content:'';position:absolute;width:16px;height:16px;background:white;border-radius:50%;top:3px;left:3px;transition:.25s;}
+input:checked+.toggle-slider{background:var(--accent);}
+input:checked+.toggle-slider::after{transform:translateX(18px);}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:48px 20px;color:var(--text3);}
+.empty-icon{width:40px;height:40px;margin:0 auto 12px;opacity:.35;}
+.empty-icon svg{width:100%;height:100%;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;}
+.empty-text{font-size:13px;}
+.empty-sub{font-size:12px;color:var(--text3);margin-top:4px;}
+
+/* ── TOAST ── */
+.toast-wrap{position:fixed;bottom:80px;right:16px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:10px;padding:11px 14px;
+  font-size:13px;display:flex;align-items:center;gap:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+  animation:toastIn .25s ease;min-width:200px;max-width:300px;
+}
+@keyframes toastIn{from{opacity:0;transform:translateX(16px);}to{opacity:1;transform:translateX(0);}}
+.toast.success{border-left:3px solid var(--accent);}
+.toast.error{border-left:3px solid var(--danger);}
+.toast.info{border-left:3px solid var(--info);}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px);}
+.modal-overlay.open{display:flex;}
+.modal{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:16px;width:420px;max-width:95vw;max-height:88vh;
+  overflow-y:auto;box-shadow:var(--shadow-lg);
+  animation:modalIn .2s ease;
+}
+@keyframes modalIn{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+.modal-head{padding:18px 20px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.modal-title{font-size:15px;font-weight:700;}
+.modal-close{width:28px;height:28px;border-radius:6px;border:none;background:var(--bg3);color:var(--text2);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.modal-close:hover{background:var(--danger);color:#fff;}
+.modal-close svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;}
+.modal-body{padding:18px 20px;}
+.modal-foot{padding:14px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end;}
+
+/* ── SEARCH BAR ── */
+.search-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.search-box{
+  flex:1;display:flex;align-items:center;gap:8px;
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:9px;padding:8px 12px;
+  transition:border-color .2s;
+}
+.search-box:focus-within{border-color:var(--accent);}
+.search-box svg{width:14px;height:14px;fill:none;stroke:var(--text3);stroke-width:2;stroke-linecap:round;flex-shrink:0;}
+.search-box input{background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;width:100%;}
+.search-box input::placeholder{color:var(--text3);}
+
+/* ── LOADING ── */
+.spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:32px auto;display:block;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── BROADCAST COMPOSE ── */
+.bc-template{
+  background:var(--bg3);border:1px solid var(--border2);
+  border-radius:10px;padding:14px;margin-bottom:12px;
+  cursor:pointer;transition:border-color .2s;
+}
+.bc-template:hover,.bc-template.selected{border-color:var(--accent);}
+.bc-template.selected{background:var(--accent-dim);}
+.bc-template-name{font-size:13px;font-weight:600;margin-bottom:4px;}
+.bc-template-preview{font-size:12px;color:var(--text3);line-height:1.5;}
+
+.bc-audience{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
+.bc-audience-opt{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 14px;border-radius:9px;
+  border:1px solid var(--border2);background:var(--bg3);
+  cursor:pointer;transition:border-color .2s;
+}
+.bc-audience-opt:hover,.bc-audience-opt.selected{border-color:var(--accent);}
+.bc-audience-opt.selected{background:var(--accent-dim);}
+.bc-audience-opt input[type=radio]{accent-color:var(--accent);}
+.bc-audience-label{font-size:13px;font-weight:500;}
+.bc-audience-sub{font-size:11px;color:var(--text3);}
+
+.bc-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
+.bc-stat{background:var(--bg3);border-radius:9px;padding:12px;text-align:center;border:1px solid var(--border);}
+.bc-stat-val{font-size:20px;font-weight:800;font-family:'Courier New',monospace;color:var(--accent);margin-bottom:3px;}
+.bc-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-family:'Courier New',monospace;}
+
+/* HISTORY LOG ITEM */
+.bc-history-item{
+  padding:12px 0;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+}
+.bc-history-item:last-child{border-bottom:none;}
+.bc-h-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.bc-h-meta{font-size:11px;color:var(--text3);font-family:'Courier New',monospace;}
+.bc-h-right{text-align:right;}
+.bc-h-count{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:var(--accent);}
+.bc-h-time{font-size:10px;color:var(--text3);}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .main{padding:14px;padding-bottom:82px;}
+  .bottom-nav{display:flex;}
+  .topbar-right .tb-divider,.topbar-right .tb-client-name{display:none;}
+  .stats-row{grid-template-columns:1fr 1fr;gap:10px;}
+  .plan-meta-row{grid-template-columns:1fr 1fr;}
+  .bc-stats-row{grid-template-columns:repeat(3,1fr);gap:8px;}
+}
+@media(min-width:601px){
+  .stats-row{grid-template-columns:repeat(4,1fr);}
+  .topbar{padding:0 28px;}
+  .main{padding:24px;padding-bottom:32px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN SCREEN ══ -->
+<div id="login-screen">
+  <div class="login-wrap">
+    <div class="login-brand">
+      <div class="login-logo">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 15v.01M12 15v.01M16 15v.01"/></svg>
+      </div>
+      <div>
+        <div class="login-name">QBOTMY</div>
+        <div class="login-sub">CLIENT PORTAL</div>
+      </div>
+    </div>
+    <div class="login-card">
+      <div class="login-heading">Sign in to your account</div>
+      <div class="login-hint">Enter your phone number and the password provided by Qoratech.</div>
+
+      <div class="fl">
+        <label class="fl-label">Phone Number</label>
+        <input id="login-phone" class="fl-input" type="tel" placeholder="01164343502" autocomplete="tel">
+      </div>
+      <div class="fl">
+        <label class="fl-label">Password</label>
+        <div style="position:relative;">
+          <input id="login-password" class="fl-input" type="password" placeholder="••••••••" autocomplete="current-password" style="padding-right:40px;">
+          <button onclick="togglePw()" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--text3);display:flex;padding:4px;">
+            <svg id="pw-eye" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+      <div id="login-error">Incorrect phone number or password. Please try again.</div>
+      <button id="login-btn" class="btn-login" onclick="tryLogin()">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+        Sign In
+      </button>
+      <div class="login-footer">Need help? Contact <a href="https://t.me/qoratechnology" target="_blank">@qoratechnology</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-left">
+      <div class="tb-logo">
+        <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 15v.01M12 15v.01M16 15v.01"/></svg>
+      </div>
+      <div>
+        <div class="tb-title">QBOTMY</div>
+      </div>
+      <div class="tb-divider"></div>
+      <div class="tb-client-name" id="tb-client-name">—</div>
+    </div>
+    <div class="topbar-right" style="gap:8px;display:flex;align-items:center;">
+      <div class="status-dot" id="topbar-status"></div>
+      <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
+        <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+      <button class="icon-btn" onclick="logout()" title="Logout" style="--clr:var(--danger)">
+        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ── DASHBOARD ── -->
+    <div class="page active" id="page-dashboard">
+      <div class="sh">
+        <div class="sh-title">Overview</div>
+        <div class="sh-sub" id="dash-greeting">Good day!</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Orders Today</div>
+          <div class="stat-value green" id="stat-orders-today">—</div>
+          <div class="stat-delta" id="stat-orders-delta">Loading…</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Revenue Today</div>
+          <div class="stat-value green" id="stat-revenue-today">—</div>
+          <div class="stat-delta" id="stat-revenue-sub">RM this month</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Conversations</div>
+          <div class="stat-value blue" id="stat-conversations">—</div>
+          <div class="stat-delta">unique chats</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Msgs This Month</div>
+          <div class="stat-value yellow" id="stat-msgs-month">—</div>
+          <div class="stat-delta" id="stat-msgs-quota">of plan limit</div>
+        </div>
+      </div>
+
+      <!-- Bot Status -->
+      <div class="bot-status-card" id="bot-status-card">
+        <div class="bsc-left">
+          <div class="bsc-avatar" id="bsc-avatar">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><path d="M8 15v.01M12 15v.01M16 15v.01"/></svg>
+          </div>
+          <div>
+            <div class="bsc-name" id="bsc-name">Loading…</div>
+            <div class="bsc-cat" id="bsc-cat">—</div>
+            <div class="status-pill running" id="bsc-status">
+              <div class="status-pill-dot"></div> RUNNING
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:5px;">
+          <button class="power-btn on" id="power-btn" onclick="toggleBot()" title="Pause / Resume bot">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="7.76" y2="7.76"/><line x1="16.24" y1="16.24" x2="19.07" y2="19.07"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/><line x1="4.93" y1="19.07" x2="7.76" y2="16.24"/><line x1="16.24" y1="7.76" x2="19.07" y2="4.93"/></svg>
+          </button>
+          <div style="font-size:9px;font-weight:700;font-family:'Courier New',monospace;letter-spacing:.6px;" id="power-label">ON</div>
+        </div>
+      </div>
+
+      <!-- Recent Orders -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Recent Orders
+          </div>
+          <button class="action-btn" onclick="showPage('orders')">View All</button>
+        </div>
+        <div class="card-body" id="dash-orders">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ORDERS ── -->
+    <div class="page" id="page-orders">
+      <div class="sh">
+        <div class="sh-title">Orders</div>
+        <div class="sh-sub">All confirmed orders from your WhatsApp bot</div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="orders-search" placeholder="Search customer, order…" oninput="filterOrders()">
+        </div>
+      </div>
+
+      <div class="msg-filter" id="order-status-filter">
+        <div class="filter-chip active" onclick="setOrderFilter('all',this)">All</div>
+        <div class="filter-chip" onclick="setOrderFilter('new',this)">New</div>
+        <div class="filter-chip" onclick="setOrderFilter('processing',this)">Processing</div>
+        <div class="filter-chip" onclick="setOrderFilter('done',this)">Done</div>
+        <div class="filter-chip" onclick="setOrderFilter('cancelled',this)">Cancelled</div>
+      </div>
+
+      <div id="orders-list">
+        <div class="spinner"></div>
+      </div>
+    </div>
+
+    <!-- ── MESSAGES ── -->
+    <div class="page" id="page-messages">
+      <div class="sh">
+        <div class="sh-title">Message Logs</div>
+        <div class="sh-sub">WhatsApp conversations handled by your bot</div>
+      </div>
+
+      <div class="search-row">
+        <div class="search-box">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="msg-search" placeholder="Search by phone number…" oninput="filterMessages()">
+        </div>
+      </div>
+
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div id="msg-list">
+          <div class="spinner"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── BROADCAST ── -->
+    <div class="page" id="page-broadcast">
+      <div class="sh">
+        <div class="sh-title">Broadcast</div>
+        <div class="sh-sub">Send promotions to your customers via WhatsApp</div>
+      </div>
+
+      <!-- Stats -->
+      <div class="bc-stats-row">
+        <div class="bc-stat">
+          <div class="bc-stat-val" id="bc-stat-total">—</div>
+          <div class="bc-stat-label">Total Customers</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-val" id="bc-stat-blasts">—</div>
+          <div class="bc-stat-label">Blasts Sent</div>
+        </div>
+        <div class="bc-stat">
+          <div class="bc-stat-val" id="bc-stat-remaining">—</div>
+          <div class="bc-stat-label">Remaining</div>
+        </div>
+      </div>
+
+      <!-- Compose -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            New Broadcast
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="fl-label" style="margin-bottom:10px;">Select Template</div>
+          <div id="bc-templates">
+            <div class="bc-template selected" onclick="selectTemplate(this,'promo')" data-id="promo">
+              <div class="bc-template-name">🎉 Promo / Tawaran</div>
+              <div class="bc-template-preview">Hai! [Nama Bisnes] ada promosi istimewa untuk anda hari ini: [Mesej Promo]. Hubungi kami sekarang!</div>
+            </div>
+            <div class="bc-template" onclick="selectTemplate(this,'reminder')" data-id="reminder">
+              <div class="bc-template-name">🔔 Peringatan / Reminder</div>
+              <div class="bc-template-preview">Peringatan daripada [Nama Bisnes]: [Mesej]. Terima kasih atas sokongan anda!</div>
+            </div>
+            <div class="bc-template" onclick="selectTemplate(this,'reopen')" data-id="reopen">
+              <div class="bc-template-name">🚀 Pembukaan Semula / Reopen</div>
+              <div class="bc-template-preview">Kami sudah buka semula! [Nama Bisnes] kini beroperasi seperti biasa. Jom order sekarang!</div>
+            </div>
+          </div>
+
+          <div class="fl" style="margin-top:16px;">
+            <label class="fl-label">Your Message / Promo Details</label>
+            <textarea id="bc-message" class="fl-input" rows="3" placeholder="Contoh: Diskaun 20% untuk semua menu hari ini sahaja!"></textarea>
+          </div>
+
+          <div class="fl-label" style="margin-bottom:10px;">Target Audience</div>
+          <div class="bc-audience">
+            <label class="bc-audience-opt selected" onclick="selectAudience(this,'all')">
+              <input type="radio" name="audience" value="all" checked>
+              <div>
+                <div class="bc-audience-label">All Customers</div>
+                <div class="bc-audience-sub">Everyone who has chatted with your bot</div>
+              </div>
+            </label>
+            <label class="bc-audience-opt" onclick="selectAudience(this,'30d')">
+              <input type="radio" name="audience" value="30d">
+              <div>
+                <div class="bc-audience-label">Active — Last 30 Days</div>
+                <div class="bc-audience-sub">Customers who messaged in the past month</div>
+              </div>
+            </label>
+            <label class="bc-audience-opt" onclick="selectAudience(this,'ordered')">
+              <input type="radio" name="audience" value="ordered">
+              <div>
+                <div class="bc-audience-label">Customers Who Ordered</div>
+                <div class="bc-audience-sub">Only confirmed order customers</div>
+              </div>
+            </label>
+          </div>
+
+          <button class="btn-login" onclick="sendBroadcast()" style="margin-top:4px;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Send Blast
+          </button>
+        </div>
+      </div>
+
+      <!-- History -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Blast History
+          </div>
+        </div>
+        <div class="card-body" id="bc-history">
+          <div class="empty">
+            <div class="empty-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
+            <div class="empty-text">No broadcasts sent yet</div>
+            <div class="empty-sub">Your blast history will appear here</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── SUBSCRIPTION ── -->
+    <div class="page" id="page-subscription">
+      <div class="sh">
+        <div class="sh-title">Subscription</div>
+        <div class="sh-sub">Your current plan and usage</div>
+      </div>
+
+      <div class="plan-display" id="plan-display">
+        <div class="plan-tier">CURRENT PLAN</div>
+        <div class="plan-name" id="plan-name">Loading…</div>
+        <div class="plan-price" id="plan-price">—</div>
+        <div class="plan-meta-row">
+          <div class="plan-meta-item">
+            <div class="plan-meta-label">Status</div>
+            <div class="plan-meta-val green" id="plan-status">—</div>
+          </div>
+          <div class="plan-meta-item">
+            <div class="plan-meta-label">Renewal</div>
+            <div class="plan-meta-val" id="plan-renewal">—</div>
+          </div>
+          <div class="plan-meta-item">
+            <div class="plan-meta-label">Start Date</div>
+            <div class="plan-meta-val" id="plan-start">—</div>
+          </div>
+          <div class="plan-meta-item">
+            <div class="plan-meta-label">Messages / Month</div>
+            <div class="plan-meta-val green" id="plan-max-msgs">—</div>
+          </div>
+        </div>
+        <div class="usage-wrap">
+          <div class="usage-label-row">
+            <div class="usage-label">Messages Used This Month</div>
+            <div class="usage-count" id="usage-count-label">0 / 0</div>
+          </div>
+          <div class="usage-bar"><div class="usage-fill" id="usage-fill" style="width:0%"></div></div>
+        </div>
+      </div>
+
+      <!-- Change Password -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Portal Password
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="fl">
+            <label class="fl-label">New Password</label>
+            <input id="new-portal-pw" class="fl-input" type="text" placeholder="Leave blank to use default (last 6 digits of your phone)" autocomplete="new-password">
+          </div>
+          <button class="btn-login" onclick="changePortalPassword()" style="margin-top:4px;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+            Update Password
+          </button>
+        </div>
+      </div>
+
+      <!-- Payments -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-head-title">
+            <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+            Payment History
+          </div>
+        </div>
+        <div class="card-body" id="payment-list">
+          <div class="spinner"></div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:8px 0;">
+        <div style="font-size:12px;color:var(--text3);">Need to upgrade or renew?</div>
+        <a href="https://t.me/qoratechnology" target="_blank" style="color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;">Contact Qoratech on Telegram →</a>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <button class="bn-item active" onclick="showPage('dashboard')" id="bn-dashboard">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+      <span>Home</span>
+    </button>
+    <button class="bn-item" onclick="showPage('orders')" id="bn-orders">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Orders</span>
+    </button>
+    <button class="bn-item" onclick="showPage('broadcast')" id="bn-broadcast">
+      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      <span>Blast</span>
+    </button>
+    <button class="bn-item" onclick="showPage('messages')" id="bn-messages">
+      <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+      <span>Chats</span>
+    </button>
+    <button class="bn-item" onclick="showPage('subscription')" id="bn-subscription">
+      <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
+      <span>Plan</span>
+    </button>
+  </nav>
+
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════
+// CONFIG — replace with real Supabase creds
+// ══════════════════════════════════════════════════════════
+const SUPA_URL = 'https://zrhgibybyvmkwcxtlyxj.supabase.co';
+const SUPA_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyaGdpYnlieXZta3djeHRseXhqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyODM2OTIsImV4cCI6MjA5NTg1OTY5Mn0.DpjJUht4kF7TORT3TYEsowWIAMqp6TQDi9efXa60tpY';
+
+const supa = async (path, opts={}) => {
+  const r = await fetch(SUPA_URL + '/rest/v1/' + path, {
+    headers: {
+      'apikey': SUPA_KEY,
+      'Authorization': 'Bearer ' + SUPA_KEY,
+      'Content-Type': 'application/json',
+      'Prefer': 'return=representation',
+      ...opts.headers
+    },
+    ...opts
+  });
+  if (!r.ok) throw new Error(await r.text());
+  return r.json();
+};
+
+// ══════════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════════
+let CLIENT = null;   // clients row
+let BOT    = null;   // bot_controls row
+let ORDERS = [];
+let MSGS   = [];
+let ORDER_FILTER = 'all';
+let SEL_TEMPLATE = 'promo';
+let SEL_AUDIENCE = 'all';
+let currentPage  = 'dashboard';
+
+// ══════════════════════════════════════════════════════════
+// THEME
+// ══════════════════════════════════════════════════════════
+function applyTheme(t){
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-icon').innerHTML = t === 'dark'
+    ? '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+  localStorage.setItem('qbotclient_theme', t);
+}
+function toggleTheme(){
+  const t = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+  applyTheme(t);
+}
+applyTheme(localStorage.getItem('qbotclient_theme') || 'dark');
+
+// ══════════════════════════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════════════════════════
+let pwVisible = false;
+function togglePw(){
+  pwVisible = !pwVisible;
+  const inp = document.getElementById('login-password');
+  inp.type = pwVisible ? 'text' : 'password';
+  document.getElementById('pw-eye').innerHTML = pwVisible
+    ? '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/>'
+    : '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>';
+}
+
+document.getElementById('login-password').addEventListener('keydown', e => { if(e.key==='Enter') tryLogin(); });
+
+async function tryLogin(){
+  const phone = document.getElementById('login-phone').value.replace(/\D/g,'');
+  const pw    = document.getElementById('login-password').value;
+  const err   = document.getElementById('login-error');
+  const btn   = document.getElementById('login-btn');
+  err.style.display = 'none';
+  if(!phone || !pw){ err.textContent='Please enter phone number and password.'; err.style.display='block'; return; }
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  try {
+    // Lookup client by owner_phone (digits only)
+    const rows = await supa(`clients?owner_phone=eq.${encodeURIComponent(phone)}&select=*&limit=1`);
+    if(!rows || rows.length === 0) throw new Error('not found');
+    const client = rows[0];
+    // Password check: custom portal_password (if set) takes priority,
+    // otherwise fallback = last 6 digits of owner_phone (e.g. 01164343502 → 343502)
+    if(client.portal_password){
+      if(pw !== client.portal_password) throw new Error('wrong');
+    } else {
+      const expectedPw = String(client.owner_phone || '').replace(/\D/g,'').slice(-6);
+      if(pw !== expectedPw || !expectedPw) throw new Error('wrong');
+    }
+    // Session
+    localStorage.setItem('qbotclient_session', JSON.stringify({ phone, client_id: client.id, ts: Date.now() }));
+    CLIENT = client;
+    await initApp();
+  } catch(e){
+    err.textContent = 'Incorrect phone number or password.';
+    err.style.display = 'block';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> Sign In';
+  }
+}
+
+function logout(){
+  localStorage.removeItem('qbotclient_session');
+  CLIENT = null; BOT = null; ORDERS = []; MSGS = [];
+  document.getElementById('app').style.display = 'none';
+  document.getElementById('login-screen').style.display = 'flex';
+  document.getElementById('login-phone').value = '';
+  document.getElementById('login-password').value = '';
+}
+
+// ══════════════════════════════════════════════════════════
+// INIT APP
+// ══════════════════════════════════════════════════════════
+async function initApp(){
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
+  document.getElementById('tb-client-name').textContent = CLIENT.business_name || CLIENT.name || 'My Business';
+
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Selamat pagi' : h < 17 ? 'Selamat tengah hari' : 'Selamat petang';
+  document.getElementById('dash-greeting').textContent = greet + ', ' + (CLIENT.business_name || 'tuan/puan') + ' 👋';
+
+  // Load in parallel
+  await Promise.all([loadBotStatus(), loadDashStats(), loadDashOrders()]);
+}
+
+// ══════════════════════════════════════════════════════════
+// BOT STATUS
+// ══════════════════════════════════════════════════════════
+async function loadBotStatus(){
+  try {
+    const rows = await supa(`bot_controls?client_id=eq.${CLIENT.id}&limit=1`);
+    BOT = rows && rows[0] ? rows[0] : { is_paused: false };
+    renderBotStatus();
+  } catch(e){ console.warn('bot_controls:', e); }
+}
+
+function renderBotStatus(){
+  const paused = BOT?.is_paused;
+  const avatar = document.getElementById('bsc-avatar');
+  const pill   = document.getElementById('bsc-status');
+  const pwrBtn = document.getElementById('power-btn');
+  const pwrLbl = document.getElementById('power-label');
+  const dot    = document.getElementById('topbar-status');
+
+  document.getElementById('bsc-name').textContent = CLIENT.business_name || CLIENT.name || '—';
+  document.getElementById('bsc-cat').textContent  = CLIENT.category || '—';
+
+  if(paused){
+    avatar.className  = 'bsc-avatar paused';
+    pill.className    = 'status-pill paused';
+    pill.innerHTML    = '<div class="status-pill-dot"></div> PAUSED';
+    pwrBtn.className  = 'power-btn off';
+    pwrLbl.textContent= 'OFF';
+    pwrLbl.style.color= 'var(--danger)';
+    dot.style.background='var(--danger)';
+  } else {
+    avatar.className  = 'bsc-avatar';
+    pill.className    = 'status-pill running';
+    pill.innerHTML    = '<div class="status-pill-dot"></div> RUNNING';
+    pwrBtn.className  = 'power-btn on';
+    pwrLbl.textContent= 'ON';
+    pwrLbl.style.color= 'var(--accent)';
+    dot.style.background='var(--accent)';
+  }
+}
+
+async function toggleBot(){
+  if(!BOT) return;
+  const newState = !BOT.is_paused;
+  try {
+    await supa(`bot_controls?client_id=eq.${CLIENT.id}`, {
+      method:'PATCH',
+      body: JSON.stringify({ is_paused: newState, paused_at: newState ? new Date().toISOString() : null })
+    });
+    BOT.is_paused = newState;
+    renderBotStatus();
+    toast(newState ? 'Bot paused ⏸' : 'Bot resumed ✅', newState ? 'info' : 'success');
+  } catch(e){ toast('Failed to update bot status', 'error'); }
+}
+
+async function changePortalPassword(){
+  const inp = document.getElementById('new-portal-pw');
+  const pw = inp.value.trim();
+  try {
+    await supa(`clients?id=eq.${CLIENT.id}`, {
+      method:'PATCH',
+      body: JSON.stringify({ portal_password: pw || null })
+    });
+    CLIENT.portal_password = pw || null;
+    inp.value = '';
+    toast(pw ? 'Password updated ✅' : 'Reverted to default password', 'success');
+  } catch(e){ toast('Failed to update password', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// DASHBOARD STATS
+// ══════════════════════════════════════════════════════════
+async function loadDashStats(){
+  try {
+    const today = new Date(); today.setHours(0,0,0,0);
+    const todayISO = today.toISOString();
+    const monthISO = new Date(today.getFullYear(), today.getMonth(), 1).toISOString();
+
+    // Orders today
+    const ordersToday = await supa(`orders?client_id=eq.${CLIENT.id}&created_at=gte.${todayISO}&select=total_amount,status`).catch(()=>[]);
+    const confirmedToday = ordersToday.filter(o => o.status !== 'cancelled');
+    const revenueToday = confirmedToday.reduce((s,o) => s + (parseFloat(o.total_amount)||0), 0);
+
+    document.getElementById('stat-orders-today').textContent = confirmedToday.length;
+    document.getElementById('stat-revenue-today').textContent = 'RM ' + revenueToday.toFixed(2);
+
+    // Month revenue
+    const ordersMonth = await supa(`orders?client_id=eq.${CLIENT.id}&created_at=gte.${monthISO}&select=total_amount,status`).catch(()=>[]);
+    const revenueMonth = ordersMonth.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+    document.getElementById('stat-revenue-sub').textContent = 'RM ' + revenueMonth.toFixed(2) + ' this month';
+
+    // Unique conversations today
+    const msgsToday = await supa(`message_logs?client_id=eq.${CLIENT.id}&created_at=gte.${todayISO}&select=customer_phone`).catch(()=>[]);
+    const unique = new Set(msgsToday.map(m=>m.customer_phone)).size;
+    document.getElementById('stat-conversations').textContent = unique;
+
+    // Messages this month + quota
+    const msgsMonth = await supa(`message_logs?client_id=eq.${CLIENT.id}&created_at=gte.${monthISO}&select=id`).catch(()=>[]);
+    const msgCount = msgsMonth.length;
+    document.getElementById('stat-msgs-month').textContent = msgCount;
+
+    // Sub for quota
+    const subs = await supa(`subscriptions?client_id=eq.${CLIENT.id}&status=eq.active&select=plan_id&limit=1`).catch(()=>[]);
+    if(subs && subs[0]){
+      const plans = await supa(`plans?id=eq.${subs[0].plan_id}&select=max_messages&limit=1`).catch(()=>[]);
+      if(plans && plans[0]) document.getElementById('stat-msgs-quota').textContent = 'of ' + plans[0].max_messages + ' limit';
+    }
+
+  } catch(e){ console.warn('stats:', e); }
+}
+
+// ══════════════════════════════════════════════════════════
+// ORDERS
+// ══════════════════════════════════════════════════════════
+async function loadOrders(){
+  try {
+    const rows = await supa(`orders?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=100`);
+    ORDERS = rows || [];
+    renderOrders('orders-list');
+  } catch(e){
+    document.getElementById('orders-list').innerHTML = '<div class="empty"><div class="empty-text">Could not load orders</div></div>';
+  }
+}
+
+async function loadDashOrders(){
+  try {
+    const rows = await supa(`orders?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=5`);
+    ORDERS = rows || [];
+    const el = document.getElementById('dash-orders');
+    if(!ORDERS.length){ el.innerHTML = '<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-text">No orders yet</div><div class="empty-sub">Confirmed orders will show here</div></div>'; return; }
+    el.innerHTML = ORDERS.map(o => orderCardHTML(o)).join('');
+  } catch(e){
+    document.getElementById('dash-orders').innerHTML = '<div class="empty"><div class="empty-text">No orders table yet</div></div>';
+  }
+}
+
+function renderOrders(targetId){
+  const el = document.getElementById(targetId);
+  if(!el) return;
+  const q = (document.getElementById('orders-search')?.value||'').toLowerCase();
+  let list = ORDERS;
+  if(ORDER_FILTER !== 'all') list = list.filter(o => o.status === ORDER_FILTER);
+  if(q) list = list.filter(o =>
+    (o.customer_name||'').toLowerCase().includes(q) ||
+    (o.customer_phone||'').includes(q) ||
+    (o.order_details||'').toLowerCase().includes(q)
+  );
+  if(!list.length){ el.innerHTML = '<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-text">No orders found</div></div>'; return; }
+  el.innerHTML = list.map(o => orderCardHTML(o, true)).join('');
+}
+
+function orderCardHTML(o, withActions=false){
+  const statusMap = { new:'badge-new', processing:'badge-processing', done:'badge-done', cancelled:'badge-cancelled' };
+  const deliveryTag = o.delivery_type === 'Delivery' ? '<span class="order-tag delivery">🚚 Delivery</span>' : '<span class="order-tag pickup">🏪 Self Pick-Up</span>';
+  const payTag = (o.payment_method||'').toLowerCase().includes('transfer') ? '<span class="order-tag transfer">💳 Transfer</span>' : '<span class="order-tag cash">💵 Cash</span>';
+  const actions = withActions ? `
+    <div class="order-actions">
+      ${o.status === 'new' ? `<button class="action-btn primary" onclick="updateOrderStatus('${o.id}','processing')">▶ Process</button>` : ''}
+      ${o.status === 'processing' ? `<button class="action-btn primary" onclick="updateOrderStatus('${o.id}','done')">✓ Mark Done</button>` : ''}
+      ${o.status !== 'cancelled' && o.status !== 'done' ? `<button class="action-btn danger" onclick="updateOrderStatus('${o.id}','cancelled')">Cancel</button>` : ''}
+    </div>` : '';
+  return `<div class="order-card" id="order-${o.id}">
+    <div class="order-top">
+      <div>
+        <div class="order-id">#${(o.id||'').slice(0,8).toUpperCase()}</div>
+        <div class="order-customer">${o.customer_name || o.customer_phone || '—'}</div>
+        <div class="order-time">${fmtDateTime(o.created_at)}</div>
+      </div>
+      <div style="text-align:right;">
+        <div class="order-amount">RM ${parseFloat(o.total_amount||0).toFixed(2)}</div>
+        <div class="badge ${statusMap[o.status]||'badge-new'}" style="margin-top:6px;">${(o.status||'new').toUpperCase()}</div>
+      </div>
+    </div>
+    <div class="order-items">${o.order_details || '—'}</div>
+    <div class="order-meta">${deliveryTag}${payTag}</div>
+    ${actions}
+  </div>`;
+}
+
+async function updateOrderStatus(id, status){
+  try {
+    await supa(`orders?id=eq.${id}`, { method:'PATCH', body: JSON.stringify({ status }) });
+    const i = ORDERS.findIndex(o=>o.id===id);
+    if(i>-1) ORDERS[i].status = status;
+    renderOrders('orders-list');
+    toast(`Order marked as ${status}`, 'success');
+  } catch(e){ toast('Update failed', 'error'); }
+}
+
+function setOrderFilter(val, el){
+  ORDER_FILTER = val;
+  document.querySelectorAll('#order-status-filter .filter-chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active');
+  renderOrders('orders-list');
+}
+function filterOrders(){ renderOrders('orders-list'); }
+
+// ══════════════════════════════════════════════════════════
+// MESSAGES
+// ══════════════════════════════════════════════════════════
+async function loadMessages(){
+  try {
+    const rows = await supa(`message_logs?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=200`);
+    MSGS = rows || [];
+    renderMessages();
+  } catch(e){
+    document.getElementById('msg-list').innerHTML = '<div class="empty"><div class="empty-text">Could not load messages</div></div>';
+  }
+}
+
+function renderMessages(){
+  const q = (document.getElementById('msg-search')?.value||'').toLowerCase();
+  let list = MSGS;
+  if(q) list = list.filter(m => (m.customer_phone||'').includes(q));
+  const el = document.getElementById('msg-list');
+  if(!list.length){ el.innerHTML = '<div class="empty" style="padding:40px;"><div class="empty-icon"><svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="empty-text">No conversations yet</div></div>'; return; }
+  let html = '';
+  let lastDate = '';
+  list.forEach(m => {
+    const d = fmtDate(m.created_at);
+    if(d !== lastDate){ html += `<div class="log-date-sep">${d}</div>`; lastDate = d; }
+    html += `<div class="log-entry">
+      <div class="log-header">
+        <div class="log-phone">${m.customer_phone||'—'}</div>
+        <div class="log-time">${fmtTime(m.created_at)}</div>
+      </div>
+      <div class="log-in">${escHtml(m.message_in||'')}</div>
+      ${m.message_out ? `<div class="log-out">${escHtml(m.message_out)}</div>` : ''}
+    </div>`;
+  });
+  el.innerHTML = html;
+}
+function filterMessages(){ renderMessages(); }
+
+// ══════════════════════════════════════════════════════════
+// SUBSCRIPTION
+// ══════════════════════════════════════════════════════════
+async function loadSubscription(){
+  try {
+    const subs = await supa(`subscriptions?client_id=eq.${CLIENT.id}&status=eq.active&limit=1`);
+    const sub = subs && subs[0];
+    if(!sub){ document.getElementById('plan-name').textContent = 'No active plan'; return; }
+
+    const plans = await supa(`plans?id=eq.${sub.plan_id}&limit=1`);
+    const plan = plans && plans[0];
+
+    document.getElementById('plan-name').textContent  = plan?.name || 'Plan';
+    document.getElementById('plan-price').textContent = plan ? `RM ${plan.price} / ${sub.billing_cycle||'month'}` : '—';
+    document.getElementById('plan-status').textContent = (sub.status||'active').toUpperCase();
+    document.getElementById('plan-renewal').textContent = sub.end_date ? fmtDate(sub.end_date) : '—';
+    document.getElementById('plan-start').textContent  = sub.start_date ? fmtDate(sub.start_date) : '—';
+    document.getElementById('plan-max-msgs').textContent = plan?.max_messages ? plan.max_messages.toLocaleString() : '—';
+
+    // Usage
+    const monthISO = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+    const msgs = await supa(`message_logs?client_id=eq.${CLIENT.id}&created_at=gte.${monthISO}&select=id`).catch(()=>[]);
+    const used = msgs.length;
+    const max  = plan?.max_messages || 1;
+    const pct  = Math.min(100, Math.round(used/max*100));
+    document.getElementById('usage-count-label').textContent = `${used.toLocaleString()} / ${max.toLocaleString()}`;
+    const fill = document.getElementById('usage-fill');
+    fill.style.width = pct + '%';
+    fill.className = 'usage-fill' + (pct>=90?' danger':pct>=70?' warn':'');
+
+    // Payments
+    const payments = await supa(`payments?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=10`).catch(()=>[]);
+    const pel = document.getElementById('payment-list');
+    if(!payments || !payments.length){ pel.innerHTML = '<div class="empty"><div class="empty-text">No payment records</div></div>'; return; }
+    pel.innerHTML = payments.map(p => `
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+        <div>
+          <div style="font-size:13px;font-weight:600;">RM ${parseFloat(p.amount||0).toFixed(2)}</div>
+          <div style="font-size:11px;color:var(--text3);font-family:'Courier New',monospace;">${fmtDate(p.created_at)} · ${p.payment_method||'—'}</div>
+        </div>
+        <div class="badge ${p.status==='paid'||p.status==='success'?'badge-done':'badge-yellow'}">${(p.status||'—').toUpperCase()}</div>
+      </div>`).join('') + '<div style="height:4px;"></div>';
+
+  } catch(e){ console.warn('sub:', e); }
+}
+
+// ══════════════════════════════════════════════════════════
+// BROADCAST
+// ══════════════════════════════════════════════════════════
+async function loadBroadcast(){
+  try {
+    const msgs = await supa(`message_logs?client_id=eq.${CLIENT.id}&select=customer_phone`).catch(()=>[]);
+    const unique = new Set(msgs.map(m=>m.customer_phone)).size;
+    document.getElementById('bc-stat-total').textContent = unique;
+
+    const blasts = await supa(`broadcasts?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=10`).catch(()=>[]);
+    document.getElementById('bc-stat-blasts').textContent = blasts?.length || 0;
+    // Monthly limit demo
+    const monthBlasts = (blasts||[]).filter(b => new Date(b.created_at) > new Date(new Date().getFullYear(), new Date().getMonth(), 1));
+    const remaining = Math.max(0, 10 - monthBlasts.length);
+    document.getElementById('bc-stat-remaining').textContent = remaining;
+
+    const bhEl = document.getElementById('bc-history');
+    if(!blasts || !blasts.length){ bhEl.innerHTML = '<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="empty-text">No broadcasts sent yet</div><div class="empty-sub">Your blast history will appear here</div></div>'; return; }
+    bhEl.innerHTML = blasts.map(b => `
+      <div class="bc-history-item">
+        <div>
+          <div class="bc-h-name">${b.template_name||'Broadcast'}</div>
+          <div class="bc-h-meta">${b.audience||'all'} · ${fmtDate(b.created_at)}</div>
+        </div>
+        <div class="bc-h-right">
+          <div class="bc-h-count">${b.sent_count||0} sent</div>
+          <div class="bc-h-time">${fmtTime(b.created_at)}</div>
+        </div>
+      </div>`).join('');
+  } catch(e){ console.warn('broadcast:', e); }
+}
+
+function selectTemplate(el, id){
+  SEL_TEMPLATE = id;
+  document.querySelectorAll('.bc-template').forEach(t=>t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+function selectAudience(el, val){
+  SEL_AUDIENCE = val;
+  document.querySelectorAll('.bc-audience-opt').forEach(t=>t.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function sendBroadcast(){
+  const msg = document.getElementById('bc-message').value.trim();
+  if(!msg){ toast('Please enter your promo message', 'error'); return; }
+  // In production: POST to n8n broadcast webhook
+  // For now: log to broadcasts table
+  try {
+    await supa('broadcasts', {
+      method:'POST',
+      body: JSON.stringify({
+        client_id: CLIENT.id,
+        template_name: SEL_TEMPLATE,
+        message: msg,
+        audience: SEL_AUDIENCE,
+        sent_count: 0,
+        status: 'queued',
+        created_at: new Date().toISOString()
+      })
+    });
+    document.getElementById('bc-message').value = '';
+    toast('Broadcast queued! ✅', 'success');
+    loadBroadcast();
+  } catch(e){ toast('Failed to queue broadcast', 'error'); }
+}
+
+// ══════════════════════════════════════════════════════════
+// NAVIGATION
+// ══════════════════════════════════════════════════════════
+const pageLoaders = {
+  dashboard:    () => Promise.all([loadBotStatus(), loadDashStats(), loadDashOrders()]),
+  orders:       loadOrders,
+  messages:     loadMessages,
+  broadcast:    loadBroadcast,
+  subscription: loadSubscription,
+};
+
+function showPage(id){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bn-item').forEach(b=>b.classList.remove('active'));
+  const pg = document.getElementById('page-'+id);
+  const bn = document.getElementById('bn-'+id);
+  if(pg) pg.classList.add('active');
+  if(bn) bn.classList.add('active');
+  currentPage = id;
+  if(pageLoaders[id]) pageLoaders[id]();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+// ══════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════
+function fmtDate(iso){
+  if(!iso) return '—';
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtTime(iso){
+  if(!iso) return '';
+  return new Date(iso).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true});
+}
+function fmtDateTime(iso){
+  if(!iso) return '—';
+  return fmtDate(iso) + ' · ' + fmtTime(iso);
+}
+function escHtml(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+// ══════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════
+function toast(msg, type='info'){
+  const wrap = document.getElementById('toast-wrap');
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  el.innerHTML = `<span>${icons[type]||''}</span><span>${msg}</span>`;
+  wrap.appendChild(el);
+  setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(20px)'; el.style.transition='.3s'; setTimeout(()=>el.remove(),300); }, 3000);
+}
+
+// ══════════════════════════════════════════════════════════
+// AUTO-LOGIN (session restore)
+// ══════════════════════════════════════════════════════════
+(async () => {
+  const sess = localStorage.getItem('qbotclient_session');
+  if(!sess) return;
+  try {
+    const { phone, ts } = JSON.parse(sess);
+    // 7-day session
+    if(Date.now() - ts > 7*24*60*60*1000){ localStorage.removeItem('qbotclient_session'); return; }
+    const rows = await supa(`clients?owner_phone=eq.${encodeURIComponent(phone)}&select=*&limit=1`);
+    if(!rows || !rows[0]) return;
+    CLIENT = rows[0];
+    await initApp();
+  } catch(e){ localStorage.removeItem('qbotclient_session'); }
+})();
+</script>
+</body>
+</html>
