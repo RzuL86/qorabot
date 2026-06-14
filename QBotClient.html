@@ -473,6 +473,16 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
 .bc-h-count{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:var(--accent);}
 .bc-h-time{font-size:10px;color:var(--text3);}
 
+/* ── LANGUAGE TOGGLE ── */
+.lang-toggle{display:flex;gap:4px;align-items:center;}
+.lang-card{
+  padding:3px 9px;border-radius:6px;
+  font-size:10px;font-weight:700;font-family:'Courier New',monospace;letter-spacing:.4px;
+  border:1px solid var(--border2);background:var(--bg3);color:var(--text3);
+  cursor:pointer;transition:all .15s;user-select:none;
+}
+.lang-card.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border);}
+
 /* ── RESPONSIVE ── */
 @media(max-width:600px){
   .main{padding:14px;padding-bottom:82px;}
@@ -547,6 +557,10 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     </div>
     <div class="topbar-right" style="gap:8px;display:flex;align-items:center;">
       <div class="status-dot" id="topbar-status"></div>
+      <div class="lang-toggle">
+        <div class="lang-card active" id="lang-en" onclick="setLang('en')">EN</div>
+        <div class="lang-card" id="lang-bm" onclick="setLang('bm')">BM</div>
+      </div>
       <button class="icon-btn" onclick="toggleTheme()" title="Toggle theme">
         <svg id="theme-icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
       </button>
@@ -562,29 +576,29 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     <!-- ── DASHBOARD ── -->
     <div class="page active" id="page-dashboard">
       <div class="sh">
-        <div class="sh-title">Overview</div>
+        <div class="sh-title" data-i18n="nav_home">Overview</div>
         <div class="sh-sub" id="dash-greeting">Good day!</div>
       </div>
 
       <!-- Stats -->
       <div class="stats-row">
         <div class="stat-card">
-          <div class="stat-label">Orders Today</div>
+          <div class="stat-label" data-i18n="stat_orders_today">Orders Today</div>
           <div class="stat-value green" id="stat-orders-today">—</div>
           <div class="stat-delta" id="stat-orders-delta">Loading…</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Revenue Today</div>
+          <div class="stat-label" data-i18n="stat_revenue_today">Revenue Today</div>
           <div class="stat-value green" id="stat-revenue-today">—</div>
           <div class="stat-delta" id="stat-revenue-sub">RM this month</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Conversations</div>
+          <div class="stat-label" data-i18n="stat_conversations">Conversations</div>
           <div class="stat-value blue" id="stat-conversations">—</div>
-          <div class="stat-delta">unique chats</div>
+          <div class="stat-delta" data-i18n="stat_unique_chats">unique chats</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Msgs This Month</div>
+          <div class="stat-label" data-i18n="stat_msgs_month">Msgs This Month</div>
           <div class="stat-value yellow" id="stat-msgs-month">—</div>
           <div class="stat-delta" id="stat-msgs-quota">of plan limit</div>
         </div>
@@ -617,9 +631,9 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
         <div class="card-head">
           <div class="card-head-title">
             <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            Recent Orders
+            <span data-i18n="dash_recent_orders">Recent Orders</span>
           </div>
-          <button class="action-btn" onclick="showPage('orders')">View All</button>
+          <button class="action-btn" onclick="showPage('orders')" data-i18n="dash_view_all">View All</button>
         </div>
         <div class="card-body" id="dash-orders">
           <div class="spinner"></div>
@@ -630,23 +644,23 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     <!-- ── ORDERS ── -->
     <div class="page" id="page-orders">
       <div class="sh">
-        <div class="sh-title">Orders</div>
-        <div class="sh-sub">All confirmed orders from your WhatsApp bot</div>
+        <div class="sh-title" data-i18n="nav_orders">Orders</div>
+        <div class="sh-sub" data-i18n="orders_sub">All confirmed orders from your WhatsApp bot</div>
       </div>
 
       <div class="search-row">
         <div class="search-box">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="orders-search" placeholder="Search customer, order…" oninput="filterOrders()">
+          <input type="text" id="orders-search" data-i18n-placeholder="orders_search_ph" placeholder="Search customer, order…" oninput="filterOrders()">
         </div>
       </div>
 
       <div class="msg-filter" id="order-status-filter">
-        <div class="filter-chip active" onclick="setOrderFilter('all',this)">All</div>
-        <div class="filter-chip" onclick="setOrderFilter('new',this)">New</div>
-        <div class="filter-chip" onclick="setOrderFilter('processing',this)">Processing</div>
-        <div class="filter-chip" onclick="setOrderFilter('done',this)">Done</div>
-        <div class="filter-chip" onclick="setOrderFilter('cancelled',this)">Cancelled</div>
+        <div class="filter-chip active" onclick="setOrderFilter('all',this)" data-i18n="filter_all">All</div>
+        <div class="filter-chip" onclick="setOrderFilter('new',this)" data-i18n="filter_new">New</div>
+        <div class="filter-chip" onclick="setOrderFilter('processing',this)" data-i18n="filter_processing">Processing</div>
+        <div class="filter-chip" onclick="setOrderFilter('done',this)" data-i18n="filter_done">Done</div>
+        <div class="filter-chip" onclick="setOrderFilter('cancelled',this)" data-i18n="filter_cancelled">Cancelled</div>
       </div>
 
       <div id="orders-list">
@@ -657,14 +671,14 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     <!-- ── MESSAGES ── -->
     <div class="page" id="page-messages">
       <div class="sh">
-        <div class="sh-title">Message Logs</div>
-        <div class="sh-sub">WhatsApp conversations handled by your bot</div>
+        <div class="sh-title" data-i18n="nav_messages">Message Logs</div>
+        <div class="sh-sub" data-i18n="messages_sub">WhatsApp conversations handled by your bot</div>
       </div>
 
       <div class="search-row">
         <div class="search-box">
           <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="msg-search" placeholder="Search by phone number…" oninput="filterMessages()">
+          <input type="text" id="msg-search" data-i18n-placeholder="messages_search_ph" placeholder="Search by phone number…" oninput="filterMessages()">
         </div>
       </div>
 
@@ -678,23 +692,23 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     <!-- ── BROADCAST ── -->
     <div class="page" id="page-broadcast">
       <div class="sh">
-        <div class="sh-title">Broadcast</div>
-        <div class="sh-sub">Send promotions to your customers via WhatsApp</div>
+        <div class="sh-title" data-i18n="nav_blast">Broadcast</div>
+        <div class="sh-sub" data-i18n="blast_sub">Send promotions to your customers via WhatsApp</div>
       </div>
 
       <!-- Stats -->
       <div class="bc-stats-row">
         <div class="bc-stat">
           <div class="bc-stat-val" id="bc-stat-total">—</div>
-          <div class="bc-stat-label">Total Customers</div>
+          <div class="bc-stat-label" data-i18n="blast_total_customers">Total Customers</div>
         </div>
         <div class="bc-stat">
           <div class="bc-stat-val" id="bc-stat-blasts">—</div>
-          <div class="bc-stat-label">Blasts Sent</div>
+          <div class="bc-stat-label" data-i18n="blast_blasts_sent">Blasts Sent</div>
         </div>
         <div class="bc-stat">
           <div class="bc-stat-val" id="bc-stat-remaining">—</div>
-          <div class="bc-stat-label">Remaining</div>
+          <div class="bc-stat-label" data-i18n="blast_remaining">Remaining</div>
         </div>
       </div>
 
@@ -703,11 +717,11 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
         <div class="card-head">
           <div class="card-head-title">
             <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            New Broadcast
+            <span data-i18n="blast_new">New Broadcast</span>
           </div>
         </div>
         <div class="card-body">
-          <div class="fl-label" style="margin-bottom:10px;">Select Template</div>
+          <div class="fl-label" style="margin-bottom:10px;" data-i18n="blast_select_template">Select Template</div>
           <div id="bc-templates">
             <div class="bc-template selected" onclick="selectTemplate(this,'promo')" data-id="promo">
               <div class="bc-template-name">🎉 Promo / Tawaran</div>
@@ -724,38 +738,38 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
           </div>
 
           <div class="fl" style="margin-top:16px;">
-            <label class="fl-label">Your Message / Promo Details</label>
-            <textarea id="bc-message" class="fl-input" rows="3" placeholder="Contoh: Diskaun 20% untuk semua menu hari ini sahaja!"></textarea>
+            <label class="fl-label" data-i18n="blast_your_message">Your Message / Promo Details</label>
+            <textarea id="bc-message" class="fl-input" rows="3" data-i18n-placeholder="blast_msg_ph" placeholder="Contoh: Diskaun 20% untuk semua menu hari ini sahaja!"></textarea>
           </div>
 
-          <div class="fl-label" style="margin-bottom:10px;">Target Audience</div>
+          <div class="fl-label" style="margin-bottom:10px;" data-i18n="blast_target">Target Audience</div>
           <div class="bc-audience">
             <label class="bc-audience-opt selected" onclick="selectAudience(this,'all')">
               <input type="radio" name="audience" value="all" checked>
               <div>
-                <div class="bc-audience-label">All Customers</div>
-                <div class="bc-audience-sub">Everyone who has chatted with your bot</div>
+                <div class="bc-audience-label" data-i18n="blast_aud_all">All Customers</div>
+                <div class="bc-audience-sub" data-i18n="blast_aud_all_sub">Everyone who has chatted with your bot</div>
               </div>
             </label>
             <label class="bc-audience-opt" onclick="selectAudience(this,'30d')">
               <input type="radio" name="audience" value="30d">
               <div>
-                <div class="bc-audience-label">Active — Last 30 Days</div>
-                <div class="bc-audience-sub">Customers who messaged in the past month</div>
+                <div class="bc-audience-label" data-i18n="blast_aud_30d">Active — Last 30 Days</div>
+                <div class="bc-audience-sub" data-i18n="blast_aud_30d_sub">Customers who messaged in the past month</div>
               </div>
             </label>
             <label class="bc-audience-opt" onclick="selectAudience(this,'ordered')">
               <input type="radio" name="audience" value="ordered">
               <div>
-                <div class="bc-audience-label">Customers Who Ordered</div>
-                <div class="bc-audience-sub">Only confirmed order customers</div>
+                <div class="bc-audience-label" data-i18n="blast_aud_ordered">Customers Who Ordered</div>
+                <div class="bc-audience-sub" data-i18n="blast_aud_ordered_sub">Only confirmed order customers</div>
               </div>
             </label>
           </div>
 
           <button class="btn-login" onclick="sendBroadcast()" style="margin-top:4px;">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            Send Blast
+            <span data-i18n="blast_send_btn">Send Blast</span>
           </button>
         </div>
       </div>
@@ -765,14 +779,14 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
         <div class="card-head">
           <div class="card-head-title">
             <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            Blast History
+            <span data-i18n="blast_history">Blast History</span>
           </div>
         </div>
         <div class="card-body" id="bc-history">
           <div class="empty">
             <div class="empty-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-            <div class="empty-text">No broadcasts sent yet</div>
-            <div class="empty-sub">Your blast history will appear here</div>
+            <div class="empty-text" data-i18n="blast_no_history">No broadcasts sent yet</div>
+            <div class="empty-sub" data-i18n="blast_no_history_sub">Your blast history will appear here</div>
           </div>
         </div>
       </div>
@@ -781,35 +795,35 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     <!-- ── SUBSCRIPTION ── -->
     <div class="page" id="page-subscription">
       <div class="sh">
-        <div class="sh-title">Subscription</div>
-        <div class="sh-sub">Your current plan and usage</div>
+        <div class="sh-title" data-i18n="nav_plan">Subscription</div>
+        <div class="sh-sub" data-i18n="plan_sub">Your current plan and usage</div>
       </div>
 
       <div class="plan-display" id="plan-display">
-        <div class="plan-tier">CURRENT PLAN</div>
+        <div class="plan-tier" data-i18n="plan_current">CURRENT PLAN</div>
         <div class="plan-name" id="plan-name">Loading…</div>
         <div class="plan-price" id="plan-price">—</div>
         <div class="plan-meta-row">
           <div class="plan-meta-item">
-            <div class="plan-meta-label">Status</div>
+            <div class="plan-meta-label" data-i18n="plan_status">Status</div>
             <div class="plan-meta-val green" id="plan-status">—</div>
           </div>
           <div class="plan-meta-item">
-            <div class="plan-meta-label">Renewal</div>
+            <div class="plan-meta-label" data-i18n="plan_renewal">Renewal</div>
             <div class="plan-meta-val" id="plan-renewal">—</div>
           </div>
           <div class="plan-meta-item">
-            <div class="plan-meta-label">Start Date</div>
+            <div class="plan-meta-label" data-i18n="plan_start">Start Date</div>
             <div class="plan-meta-val" id="plan-start">—</div>
           </div>
           <div class="plan-meta-item">
-            <div class="plan-meta-label">Messages / Month</div>
+            <div class="plan-meta-label" data-i18n="plan_msgs_month">Messages / Month</div>
             <div class="plan-meta-val green" id="plan-max-msgs">—</div>
           </div>
         </div>
         <div class="usage-wrap">
           <div class="usage-label-row">
-            <div class="usage-label">Messages Used This Month</div>
+            <div class="usage-label" data-i18n="plan_usage_label">Messages Used This Month</div>
             <div class="usage-count" id="usage-count-label">0 / 0</div>
           </div>
           <div class="usage-bar"><div class="usage-fill" id="usage-fill" style="width:0%"></div></div>
@@ -821,17 +835,17 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
         <div class="card-head">
           <div class="card-head-title">
             <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Portal Password
+            <span data-i18n="plan_portal_pw">Portal Password</span>
           </div>
         </div>
         <div class="card-body">
           <div class="fl">
-            <label class="fl-label">New Password</label>
-            <input id="new-portal-pw" class="fl-input" type="text" placeholder="Leave blank to use default (last 6 digits of your phone)" autocomplete="new-password">
+            <label class="fl-label" data-i18n="plan_new_pw">New Password</label>
+            <input id="new-portal-pw" class="fl-input" type="text" data-i18n-placeholder="plan_new_pw_ph" placeholder="Leave blank to use default (last 6 digits of your phone)" autocomplete="new-password">
           </div>
           <button class="btn-login" onclick="changePortalPassword()" style="margin-top:4px;">
             <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            Update Password
+            <span data-i18n="plan_update_pw_btn">Update Password</span>
           </button>
         </div>
       </div>
@@ -841,7 +855,7 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
         <div class="card-head">
           <div class="card-head-title">
             <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-            Payment History
+            <span data-i18n="plan_payment_history">Payment History</span>
           </div>
         </div>
         <div class="card-body" id="payment-list">
@@ -850,8 +864,8 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
       </div>
 
       <div style="text-align:center;padding:8px 0;">
-        <div style="font-size:12px;color:var(--text3);">Need to upgrade or renew?</div>
-        <a href="https://t.me/qoratechnology" target="_blank" style="color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;">Contact Qoratech on Telegram →</a>
+        <div style="font-size:12px;color:var(--text3);" data-i18n="plan_upgrade_prompt">Need to upgrade or renew?</div>
+        <a href="https://t.me/qoratechnology" target="_blank" style="color:var(--accent);font-size:13px;font-weight:600;text-decoration:none;" data-i18n="plan_upgrade_link">Contact Qoratech on Telegram →</a>
       </div>
     </div>
 
@@ -861,23 +875,23 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
   <nav class="bottom-nav">
     <button class="bn-item active" onclick="showPage('dashboard')" id="bn-dashboard">
       <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-      <span>Home</span>
+      <span data-i18n="nav_home">Home</span>
     </button>
     <button class="bn-item" onclick="showPage('orders')" id="bn-orders">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Orders</span>
+      <span data-i18n="nav_orders">Orders</span>
     </button>
     <button class="bn-item" onclick="showPage('broadcast')" id="bn-broadcast">
       <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      <span>Blast</span>
+      <span data-i18n="nav_blast">Blast</span>
     </button>
     <button class="bn-item" onclick="showPage('messages')" id="bn-messages">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-      <span>Chats</span>
+      <span data-i18n="nav_messages">Chats</span>
     </button>
     <button class="bn-item" onclick="showPage('subscription')" id="bn-subscription">
       <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
-      <span>Plan</span>
+      <span data-i18n="nav_plan">Plan</span>
     </button>
   </nav>
 
@@ -919,6 +933,104 @@ let ORDER_FILTER = 'all';
 let SEL_TEMPLATE = 'promo';
 let SEL_AUDIENCE = 'all';
 let currentPage  = 'dashboard';
+let LANG = localStorage.getItem('qbotclient_lang') || 'en';
+
+// ══════════════════════════════════════════════════════════
+// I18N
+// ══════════════════════════════════════════════════════════
+const LANG_DICT = {
+  en: {
+    nav_home:'Home', nav_orders:'Orders', nav_blast:'Blast',
+    nav_messages:'Chats', nav_plan:'Plan',
+    stat_orders_today:'Orders Today', stat_revenue_today:'Revenue Today',
+    stat_conversations:'Conversations', stat_unique_chats:'unique chats',
+    stat_msgs_month:'Msgs This Month',
+    dash_recent_orders:'Recent Orders', dash_view_all:'View All',
+    orders_sub:'All confirmed orders from your WhatsApp bot',
+    orders_search_ph:'Search customer, order…',
+    filter_all:'All', filter_new:'New', filter_processing:'Processing',
+    filter_done:'Done', filter_cancelled:'Cancelled',
+    messages_sub:'WhatsApp conversations handled by your bot',
+    messages_search_ph:'Search by phone number…',
+    blast_sub:'Send promotions to your customers via WhatsApp',
+    blast_total_customers:'Total Customers', blast_blasts_sent:'Blasts Sent',
+    blast_remaining:'Remaining', blast_new:'New Broadcast',
+    blast_select_template:'Select Template',
+    blast_your_message:'Your Message / Promo Details',
+    blast_msg_ph:'E.g. 20% off all menu items today only!',
+    blast_target:'Target Audience',
+    blast_aud_all:'All Customers', blast_aud_all_sub:'Everyone who has chatted with your bot',
+    blast_aud_30d:'Active — Last 30 Days', blast_aud_30d_sub:'Customers who messaged in the past month',
+    blast_aud_ordered:'Customers Who Ordered', blast_aud_ordered_sub:'Only confirmed order customers',
+    blast_send_btn:'Send Blast', blast_history:'Blast History',
+    blast_no_history:'No broadcasts sent yet', blast_no_history_sub:'Your blast history will appear here',
+    nav_plan:'Plan', plan_sub:'Your current plan and usage',
+    plan_current:'CURRENT PLAN', plan_status:'Status', plan_renewal:'Renewal',
+    plan_start:'Start Date', plan_msgs_month:'Messages / Month',
+    plan_usage_label:'Messages Used This Month',
+    plan_portal_pw:'Portal Password', plan_new_pw:'New Password',
+    plan_new_pw_ph:'Leave blank to use default (last 6 digits of your phone)',
+    plan_update_pw_btn:'Update Password', plan_payment_history:'Payment History',
+    plan_upgrade_prompt:'Need to upgrade or renew?',
+    plan_upgrade_link:'Contact Qoratech on Telegram →',
+  },
+  bm: {
+    nav_home:'Utama', nav_orders:'Pesanan', nav_blast:'Serbar',
+    nav_messages:'Sembang', nav_plan:'Pelan',
+    stat_orders_today:'Pesanan Hari Ini', stat_revenue_today:'Pendapatan Hari Ini',
+    stat_conversations:'Perbualan', stat_unique_chats:'sembang unik',
+    stat_msgs_month:'Mesej Bulan Ini',
+    dash_recent_orders:'Pesanan Terbaru', dash_view_all:'Lihat Semua',
+    orders_sub:'Semua pesanan yang disahkan daripada bot WhatsApp anda',
+    orders_search_ph:'Cari pelanggan, pesanan…',
+    filter_all:'Semua', filter_new:'Baru', filter_processing:'Diproses',
+    filter_done:'Selesai', filter_cancelled:'Dibatalkan',
+    messages_sub:'Perbualan WhatsApp yang dikendalikan oleh bot anda',
+    messages_search_ph:'Cari mengikut nombor telefon…',
+    blast_sub:'Hantar promosi kepada pelanggan anda melalui WhatsApp',
+    blast_total_customers:'Jumlah Pelanggan', blast_blasts_sent:'Serbar Dihantar',
+    blast_remaining:'Berbaki', blast_new:'Serbar Baharu',
+    blast_select_template:'Pilih Templat',
+    blast_your_message:'Mesej / Butiran Promo Anda',
+    blast_msg_ph:'Contoh: Diskaun 20% untuk semua menu hari ini sahaja!',
+    blast_target:'Sasaran Pelanggan',
+    blast_aud_all:'Semua Pelanggan', blast_aud_all_sub:'Semua yang pernah berbual dengan bot anda',
+    blast_aud_30d:'Aktif — 30 Hari Lepas', blast_aud_30d_sub:'Pelanggan yang menghantar mesej dalam sebulan lepas',
+    blast_aud_ordered:'Pelanggan Yang Menempah', blast_aud_ordered_sub:'Hanya pelanggan dengan pesanan disahkan',
+    blast_send_btn:'Hantar Serbar', blast_history:'Sejarah Serbar',
+    blast_no_history:'Tiada serbar dihantar lagi', blast_no_history_sub:'Sejarah serbar anda akan dipaparkan di sini',
+    nav_plan:'Pelan', plan_sub:'Pelan semasa dan penggunaan anda',
+    plan_current:'PELAN SEMASA', plan_status:'Status', plan_renewal:'Pembaharuan',
+    plan_start:'Tarikh Mula', plan_msgs_month:'Mesej / Bulan',
+    plan_usage_label:'Mesej Digunakan Bulan Ini',
+    plan_portal_pw:'Kata Laluan Portal', plan_new_pw:'Kata Laluan Baharu',
+    plan_new_pw_ph:'Biar kosong untuk gunakan lalai (6 digit terakhir nombor telefon)',
+    plan_update_pw_btn:'Kemaskini Kata Laluan', plan_payment_history:'Sejarah Pembayaran',
+    plan_upgrade_prompt:'Perlu naik taraf atau memperbaharui?',
+    plan_upgrade_link:'Hubungi Qoratech di Telegram →',
+  }
+};
+
+function applyLang(lang){
+  const d = LANG_DICT[lang] || LANG_DICT.en;
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if(d[key] !== undefined) el.textContent = d[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if(d[key] !== undefined) el.placeholder = d[key];
+  });
+  // Toggle active state on lang cards
+  document.getElementById('lang-en').classList.toggle('active', lang==='en');
+  document.getElementById('lang-bm').classList.toggle('active', lang==='bm');
+}
+
+function setLang(lang){
+  LANG = lang;
+  localStorage.setItem('qbotclient_lang', lang);
+  applyLang(lang);
+}
 
 // ══════════════════════════════════════════════════════════
 // THEME
@@ -1251,43 +1363,54 @@ async function loadSubscription(){
   try {
     const subs = await supa(`subscriptions?client_id=eq.${CLIENT.id}&status=eq.active&limit=1`);
     const sub = subs && subs[0];
-    if(!sub){ document.getElementById('plan-name').textContent = 'No active plan'; return; }
 
-    const plans = await supa(`plans?id=eq.${sub.plan_id}&limit=1`);
-    const plan = plans && plans[0];
+    if(!sub){
+      document.getElementById('plan-name').textContent = 'No active plan';
+    } else {
+      const plans = await supa(`plans?id=eq.${sub.plan_id}&limit=1`);
+      const plan = plans && plans[0];
 
-    document.getElementById('plan-name').textContent  = plan?.name || 'Plan';
-    document.getElementById('plan-price').textContent = plan ? `RM ${plan.price} / ${sub.billing_cycle||'month'}` : '—';
-    document.getElementById('plan-status').textContent = (sub.status||'active').toUpperCase();
-    document.getElementById('plan-renewal').textContent = sub.end_date ? fmtDate(sub.end_date) : '—';
-    document.getElementById('plan-start').textContent  = sub.start_date ? fmtDate(sub.start_date) : '—';
-    document.getElementById('plan-max-msgs').textContent = plan?.max_messages ? plan.max_messages.toLocaleString() : '—';
+      document.getElementById('plan-name').textContent  = plan?.name || 'Plan';
+      document.getElementById('plan-price').textContent = plan ? `RM ${plan.price} / ${sub.billing_cycle||'month'}` : '—';
+      document.getElementById('plan-status').textContent = (sub.status||'active').toUpperCase();
+      document.getElementById('plan-renewal').textContent = sub.end_date ? fmtDate(sub.end_date) : '—';
+      document.getElementById('plan-start').textContent  = sub.start_date ? fmtDate(sub.start_date) : '—';
+      document.getElementById('plan-max-msgs').textContent = plan?.max_messages ? plan.max_messages.toLocaleString() : '—';
 
-    // Usage
-    const monthISO = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
-    const msgs = await supa(`message_logs?client_id=eq.${CLIENT.id}&created_at=gte.${monthISO}&select=id`).catch(()=>[]);
-    const used = msgs.length;
-    const max  = plan?.max_messages || 1;
-    const pct  = Math.min(100, Math.round(used/max*100));
-    document.getElementById('usage-count-label').textContent = `${used.toLocaleString()} / ${max.toLocaleString()}`;
-    const fill = document.getElementById('usage-fill');
-    fill.style.width = pct + '%';
-    fill.className = 'usage-fill' + (pct>=90?' danger':pct>=70?' warn':'');
+      // Usage bar
+      const monthISO = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString();
+      const msgs = await supa(`message_logs?client_id=eq.${CLIENT.id}&created_at=gte.${monthISO}&select=id`).catch(()=>[]);
+      const used = msgs.length;
+      const max  = plan?.max_messages || 1;
+      const pct  = Math.min(100, Math.round(used/max*100));
+      document.getElementById('usage-count-label').textContent = `${used.toLocaleString()} / ${max.toLocaleString()}`;
+      const fill = document.getElementById('usage-fill');
+      fill.style.width = pct + '%';
+      fill.className = 'usage-fill' + (pct>=90?' danger':pct>=70?' warn':'');
+    }
 
-    // Payments
+    // Payments — always runs, regardless of sub state (fixes infinite spinner)
     const payments = await supa(`payments?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=10`).catch(()=>[]);
     const pel = document.getElementById('payment-list');
-    if(!payments || !payments.length){ pel.innerHTML = '<div class="empty"><div class="empty-text">No payment records</div></div>'; return; }
-    pel.innerHTML = payments.map(p => `
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
-        <div>
-          <div style="font-size:13px;font-weight:600;">RM ${parseFloat(p.amount||0).toFixed(2)}</div>
-          <div style="font-size:11px;color:var(--text3);font-family:'Courier New',monospace;">${fmtDate(p.created_at)} · ${p.payment_method||'—'}</div>
-        </div>
-        <div class="badge ${p.status==='paid'||p.status==='success'?'badge-done':'badge-yellow'}">${(p.status||'—').toUpperCase()}</div>
-      </div>`).join('') + '<div style="height:4px;"></div>';
+    if(!payments || !payments.length){
+      pel.innerHTML = '<div class="empty"><div class="empty-text">No payment records</div></div>';
+    } else {
+      pel.innerHTML = payments.map(p => `
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:600;">RM ${parseFloat(p.amount||0).toFixed(2)}</div>
+            <div style="font-size:11px;color:var(--text3);font-family:'Courier New',monospace;">${fmtDate(p.created_at)} · ${p.payment_method||'—'}</div>
+          </div>
+          <div class="badge ${p.status==='paid'||p.status==='success'?'badge-done':'badge-yellow'}">${(p.status||'—').toUpperCase()}</div>
+        </div>`).join('') + '<div style="height:4px;"></div>';
+    }
 
-  } catch(e){ console.warn('sub:', e); }
+  } catch(e){
+    console.warn('sub:', e);
+    // On any error, clear the spinner so it doesn't hang
+    const pel = document.getElementById('payment-list');
+    if(pel) pel.innerHTML = '<div class="empty"><div class="empty-text">Could not load payment records</div></div>';
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1415,6 +1538,9 @@ function toast(msg, type='info'){
 // AUTO-LOGIN (session restore)
 // ══════════════════════════════════════════════════════════
 (async () => {
+  // Apply saved language immediately on load
+  applyLang(LANG);
+
   const sess = localStorage.getItem('qbotclient_session');
   if(!sess) return;
   try {
