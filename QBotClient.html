@@ -180,7 +180,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .bn-item span{font-size:9px;font-weight:700;font-family:'Courier New',monospace;letter-spacing:.2px;}
 
 /* MAIN CONTENT */
-.main{padding:20px;max-width:720px;margin:0 auto;padding-bottom:90px;}
+.main{padding:20px;max-width:720px;margin:0 auto;padding-bottom:90px;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;}
 
 /* PAGE TRANSITIONS */
 .page{display:none;}
@@ -312,7 +312,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .action-btn.danger:hover{border-color:var(--danger);color:var(--danger);}
 
 /* ── MESSAGE LOG ── */
-.msg-filter{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.msg-filter{display:flex;gap:8px;margin-bottom:14px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;touch-action:pan-x;}
 .msg-filter::-webkit-scrollbar{display:none;}
 .filter-chip{
   padding:5px 13px;border-radius:20px;font-size:12px;font-weight:600;
@@ -484,18 +484,94 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
 .lang-card.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border);}
 
 /* ── RESPONSIVE ── */
+
+/* Mobile-first base (≤600px) */
 @media(max-width:600px){
-  .main{padding:14px;padding-bottom:82px;}
+  /* Layout */
+  .main{padding:12px 12px 90px;}
   .bottom-nav{display:flex;}
-  .topbar-right .tb-divider,.topbar-right .tb-client-name{display:none;}
-  .stats-row{grid-template-columns:1fr 1fr;gap:10px;}
-  .plan-meta-row{grid-template-columns:1fr 1fr;}
-  .bc-stats-row{grid-template-columns:repeat(3,1fr);gap:8px;}
+
+  /* Topbar — hide divider + client name, tighten padding */
+  .topbar{padding:0 12px;}
+  .tb-divider,.tb-client-name{display:none;}
+  .tb-title{font-size:13px;}
+  /* Shrink lang cards slightly so they fit */
+  .lang-card{padding:3px 7px;font-size:9px;}
+
+  /* Stats — 2 column, tighter numbers */
+  .stats-row{grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;}
+  .stat-card{padding:12px 14px;}
+  .stat-value{font-size:22px;}
+
+  /* Bot status card — stack on very small screens */
+  .bot-status-card{padding:14px 16px;gap:12px;}
+  .bsc-avatar{width:40px;height:40px;border-radius:11px;}
+  .bsc-avatar svg{width:19px;height:19px;}
+  .bsc-name{font-size:14px;}
+  .power-btn{width:44px;height:44px;}
+  .power-btn svg{width:18px;height:18px;}
+
+  /* Cards */
+  .card-head{padding:12px 14px;}
+  .card-body{padding:14px 14px;}
+
+  /* Order cards — prevent amount from wrapping badly */
+  .order-top{gap:8px;}
+  .order-amount{font-size:16px;}
+  .order-actions{flex-wrap:wrap;gap:6px;}
+  .action-btn{padding:6px 14px;font-size:12px;min-height:34px;}
+
+  /* Plan meta — 2 col on mobile is fine */
+  .plan-meta-row{grid-template-columns:1fr 1fr;gap:8px;}
+  .plan-meta-item{padding:9px 10px;}
+  .plan-name{font-size:18px;}
+
+  /* Broadcast stats — 3 col fits but tighten */
+  .bc-stats-row{grid-template-columns:repeat(3,1fr);gap:6px;}
+  .bc-stat{padding:10px 8px;}
+  .bc-stat-val{font-size:17px;}
+  .bc-stat-label{font-size:9px;}
+
+  /* Broadcast audience options — full touch target */
+  .bc-audience-opt{padding:12px 12px;min-height:52px;}
+
+  /* Section header */
+  .sh-title{font-size:16px;}
+
+  /* Filter chips — horizontal scroll, big enough to tap */
+  .filter-chip{padding:6px 14px;font-size:12px;}
+
+  /* Search input — full tap height */
+  .search-box{padding:9px 12px;}
+  .search-box input{font-size:14px;}
+
+  /* Modal — full-width bottom sheet feel */
+  .modal{width:100%;max-width:100%;border-bottom-left-radius:0;border-bottom-right-radius:0;margin-top:auto;}
+  .modal-overlay{align-items:flex-end;}
+
+  /* Toast — full width on mobile */
+  .toast-wrap{right:12px;left:12px;bottom:calc(70px + env(safe-area-inset-bottom));}
+  .toast{min-width:0;max-width:100%;width:100%;}
+
+  /* Usage bar label row — stack if needed */
+  .usage-label-row{flex-wrap:wrap;gap:4px;}
+
+  /* Log entries — better touch size */
+  .log-entry{padding:14px 14px;}
+  .log-in{font-size:13px;}
+  .log-out{font-size:12px;}
+
+  /* Inputs — prevent iOS zoom (must be ≥16px) */
+  .fl-input{font-size:16px;}
+  textarea.fl-input{font-size:16px;}
 }
+
+/* Desktop (≥601px) */
 @media(min-width:601px){
   .stats-row{grid-template-columns:repeat(4,1fr);}
   .topbar{padding:0 28px;}
   .main{padding:24px;padding-bottom:32px;}
+  .plan-meta-row{grid-template-columns:1fr 1fr;}
 }
 </style>
 </head>
