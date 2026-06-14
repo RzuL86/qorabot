@@ -1825,11 +1825,21 @@ async function loadDetailProducts(clientId) {
             ${p.is_available?'<span class="badge badge-green">Available</span>':'<span class="badge badge-red">Unavailable</span>'}
             ${p.is_featured?'<span class="badge badge-yellow">Featured</span>':''}
           </div>
+          <button class="action-btn danger" style="margin-top:8px;width:100%;text-align:center" onclick="deleteDetailProduct('${p.id}','${clientId}')">Delete</button>
         </div>
       </div>`).join('')}</div>`;
   } catch(e) {
     el.innerHTML = `<div style="color:var(--danger);font-size:13px">Error: ${e.message}</div>`;
   }
+}
+
+async function deleteDetailProduct(id, clientId) {
+  if (!confirm('Delete this product?')) return;
+  try {
+    await sbDelete('products', id);
+    toast('Deleted', 'success');
+    loadDetailProducts(clientId);
+  } catch(e) { toast('Failed: '+e.message,'error'); }
 }
 
 async function saveClientDetail() {
