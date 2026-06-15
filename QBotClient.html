@@ -543,11 +543,12 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
 .chart-total{font-size:11px;color:var(--text3);font-family:'Courier New',monospace;}
 .chart-svg-wrap{width:100%;overflow-x:auto;}
 .chart-svg-wrap svg{display:block;}
-.chart-bar{fill:var(--accent);opacity:.85;rx:3;transition:opacity .1s;}
-.chart-bar:hover{opacity:1;}
+.chart-bar{opacity:1;transition:opacity .1s;}
+.chart-bar:hover{opacity:.85;}
 .chart-label{font-size:9px;fill:var(--text3);font-family:'Courier New',monospace;text-anchor:middle;}
 .chart-yval{font-size:9px;fill:var(--text3);font-family:'Courier New',monospace;text-anchor:end;}
 .chart-grid{stroke:var(--border);stroke-width:.5;}
+.chart-baseline{stroke:var(--border2,var(--border));stroke-width:1;}
 .chart-empty{text-align:center;padding:40px 0;color:var(--text3);font-size:13px;}
 .stats-summary-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
 .stats-sum-card{
@@ -1529,7 +1530,7 @@ function renderStats(){
   const periodUnitNames = { daily:'day', weekly:'week', monthly:'month', yearly:'year' };
   const periodUnitNamesBM = { daily:'hari', weekly:'minggu', monthly:'bulan', yearly:'tahun' };
   const unitName = (LANG==='bm' ? periodUnitNamesBM : periodUnitNames)[STATS_PERIOD] || STATS_PERIOD;
-  document.getElementById('stats-avg-sub').textContent       = (LANG==='bm' ? 'setiap ' : 'per active ') + (LANG==='bm' ? unitName + ' aktif' : 'active ' + unitName);
+  document.getElementById('stats-avg-sub').textContent       = (LANG==='bm' ? 'setiap ' + unitName + ' aktif' : 'per active ' + unitName);
   document.getElementById('chart-title').textContent         = chartTitles[STATS_PERIOD];
   document.getElementById('chart-range-label').textContent   = periodNames[STATS_PERIOD];
 
@@ -1628,23 +1629,37 @@ function renderBarChart(labels, values, containerId){
   const H        = 180;
   const padL     = 44;
   const padR     = 8;
-  const padT     = 10;
+  const padT     = 16;
   const padB     = 36;
   const chartW   = W - padL - padR;
   const chartH   = H - padT - padB;
   const maxVal   = Math.max(...values);
-  const barW     = Math.max(8, chartW / labels.length - 5);
+  // Cap bar width so a single/sparse bucket doesn't render as a giant block
+  const barW     = Math.min(Math.max(8, chartW / labels.length - 5), 56);
   const gap      = chartW / labels.length;
+  const radius   = Math.min(4, barW/2);
 
-  // Y grid lines & labels (4 lines)
+  // Y grid lines & labels (4 lines, dashed for a lighter feel)
   let gridSVG = '';
   for(let i=0; i<=4; i++){
     const y = padT + chartH - (i/4)*chartH;
     const v = (maxVal * i/4);
     const vLabel = v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0);
-    gridSVG += `<line class="chart-grid" x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}"/>`;
+    gridSVG += `<line class="chart-grid" x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke-dasharray="${i===0?'0':'2,3'}"/>`;
     gridSVG += `<text class="chart-yval" x="${padL-4}" y="${y+3}">${vLabel}</text>`;
   }
+
+  // Gradient definition for bars
+  const defsSVG = `<defs>
+    <linearGradient id="barGrad-${containerId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--accent)" stop-opacity="1"/>
+      <stop offset="100%" stop-color="var(--accent)" stop-opacity=".55"/>
+    </linearGradient>
+    <linearGradient id="barGradMuted-${containerId}" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="var(--accent)" stop-opacity=".65"/>
+      <stop offset="100%" stop-color="var(--accent)" stop-opacity=".25"/>
+    </linearGradient>
+  </defs>`;
 
   // Bars + labels
   let barsSVG = '';
@@ -1653,19 +1668,35 @@ function renderBarChart(labels, values, containerId){
     const x     = padL + gap*i + (gap-barW)/2;
     const y     = padT + chartH - barH;
     const isMax = v === maxVal && v > 0;
-    barsSVG += `<rect class="chart-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH,0).toFixed(1)}" rx="3" fill="${isMax?'var(--accent)':'rgba(37,211,102,.6)'}">
-      <title>${labels[i]}: RM ${v.toFixed(2)}</title>
-    </rect>`;
+    const fill  = isMax ? `url(#barGrad-${containerId})` : `url(#barGradMuted-${containerId})`;
+    // Rounded top corners only, flat bottom (sits flush on baseline)
+    const h = Math.max(barH, v > 0 ? 2 : 0);
+    if(h > 0){
+      const r = Math.min(radius, h);
+      barsSVG += `<path class="chart-bar" d="
+        M${x.toFixed(1)},${(y+r).toFixed(1)}
+        a${r},${r} 0 0 1 ${r},-${r}
+        h${(barW-2*r).toFixed(1)}
+        a${r},${r} 0 0 1 ${r},${r}
+        v${(h-r).toFixed(1)}
+        h-${barW.toFixed(1)}
+        Z" fill="${fill}">
+        <title>${labels[i]}: RM ${v.toFixed(2)}</title>
+      </path>`;
+    }
     // Show value above bar if it has revenue
     if(v > 0){
       const vStr = v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0);
-      barsSVG += `<text class="chart-label" x="${(x+barW/2).toFixed(1)}" y="${(y-3).toFixed(1)}" style="font-size:8px;fill:var(--text2);">${vStr}</text>`;
+      barsSVG += `<text class="chart-label" x="${(x+barW/2).toFixed(1)}" y="${(y-5).toFixed(1)}" style="font-size:9px;font-weight:700;fill:var(--text2);">${vStr}</text>`;
     }
-    barsSVG += `<text class="chart-label" x="${(x+barW/2).toFixed(1)}" y="${(padT+chartH+14).toFixed(1)}">${labels[i]}</text>`;
+    barsSVG += `<text class="chart-label" x="${(x+barW/2).toFixed(1)}" y="${(padT+chartH+16).toFixed(1)}">${labels[i]}</text>`;
   });
 
+  // Baseline axis
+  const baseline = `<line class="chart-baseline" x1="${padL}" y1="${padT+chartH}" x2="${W-padR}" y2="${padT+chartH}"/>`;
+
   wrap.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="min-width:${W}px">
-    ${gridSVG}${barsSVG}
+    ${defsSVG}${gridSVG}${baseline}${barsSVG}
   </svg>`;
 }
 
