@@ -433,15 +433,6 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
 @keyframes spin{to{transform:rotate(360deg);}}
 
 /* ── BROADCAST COMPOSE ── */
-.bc-template{
-  background:var(--bg3);border:1px solid var(--border2);
-  border-radius:10px;padding:14px;margin-bottom:12px;
-  cursor:pointer;transition:border-color .2s;
-}
-.bc-template:hover,.bc-template.selected{border-color:var(--accent);}
-.bc-template.selected{background:var(--accent-dim);}
-.bc-template-name{font-size:13px;font-weight:600;margin-bottom:4px;}
-.bc-template-preview{font-size:12px;color:var(--text3);line-height:1.5;}
 
 .bc-audience{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
 .bc-audience-opt{
@@ -797,23 +788,7 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
           </div>
         </div>
         <div class="card-body">
-          <div class="fl-label" style="margin-bottom:10px;" data-i18n="blast_select_template">Select Template</div>
-          <div id="bc-templates">
-            <div class="bc-template selected" onclick="selectTemplate(this,'promo')" data-id="promo">
-              <div class="bc-template-name">🎉 Promo / Tawaran</div>
-              <div class="bc-template-preview">Hai! [Nama Bisnes] ada promosi istimewa untuk anda hari ini: [Mesej Promo]. Hubungi kami sekarang!</div>
-            </div>
-            <div class="bc-template" onclick="selectTemplate(this,'reminder')" data-id="reminder">
-              <div class="bc-template-name">🔔 Peringatan / Reminder</div>
-              <div class="bc-template-preview">Peringatan daripada [Nama Bisnes]: [Mesej]. Terima kasih atas sokongan anda!</div>
-            </div>
-            <div class="bc-template" onclick="selectTemplate(this,'reopen')" data-id="reopen">
-              <div class="bc-template-name">🚀 Pembukaan Semula / Reopen</div>
-              <div class="bc-template-preview">Kami sudah buka semula! [Nama Bisnes] kini beroperasi seperti biasa. Jom order sekarang!</div>
-            </div>
-          </div>
-
-          <div class="fl" style="margin-top:16px;">
+          <div class="fl">
             <label class="fl-label" data-i18n="blast_your_message">Your Message / Promo Details</label>
             <textarea id="bc-message" class="fl-input" rows="3" data-i18n-placeholder="blast_msg_ph" placeholder="Contoh: Diskaun 20% untuk semua menu hari ini sahaja!"></textarea>
           </div>
@@ -1192,7 +1167,11 @@ async function initApp(){
 
   const h = new Date().getHours();
   const greet = h < 12 ? 'Selamat pagi' : h < 17 ? 'Selamat tengah hari' : 'Selamat petang';
-  document.getElementById('dash-greeting').textContent = greet + ', ' + (CLIENT.business_name || 'tuan/puan') + ' 👋';
+  document.getElementById('dash-greeting').textContent = greet + ', ' + (CLIENT.business_name || 'tuan/puan');
+
+  // Request notification permission + start polling
+  requestNotifPermission();
+  startPolling();
 
   // Load in parallel
   await Promise.all([loadBotStatus(), loadDashStats(), loadDashOrders()]);
@@ -1249,7 +1228,7 @@ async function toggleBot(){
     });
     BOT.is_paused = newState;
     renderBotStatus();
-    toast(newState ? 'Bot paused ⏸' : 'Bot resumed ✅', newState ? 'info' : 'success');
+    toast(newState ? 'Bot paused' : 'Bot resumed', newState ? 'info' : 'success');
   } catch(e){ toast('Failed to update bot status', 'error'); }
 }
 
@@ -1263,7 +1242,7 @@ async function changePortalPassword(){
     });
     CLIENT.portal_password = pw || null;
     inp.value = '';
-    toast(pw ? 'Password updated ✅' : 'Reverted to default password', 'success');
+    toast(pw ? 'Password updated' : 'Reverted to default password', 'success');
   } catch(e){ toast('Failed to update password', 'error'); }
 }
 
@@ -1351,13 +1330,17 @@ function renderOrders(targetId){
 
 function orderCardHTML(o, withActions=false){
   const statusMap = { new:'badge-new', processing:'badge-processing', done:'badge-done', cancelled:'badge-cancelled' };
-  const deliveryTag = o.delivery_type === 'Delivery' ? '<span class="order-tag delivery">🚚 Delivery</span>' : '<span class="order-tag pickup">🏪 Self Pick-Up</span>';
-  const payTag = (o.payment_method||'').toLowerCase().includes('transfer') ? '<span class="order-tag transfer">💳 Transfer</span>' : '<span class="order-tag cash">💵 Cash</span>';
+  const deliveryTag = o.delivery_type === 'Delivery'
+    ? `<span class="order-tag delivery"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg> Delivery</span>`
+    : `<span class="order-tag pickup"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Pick-Up</span>`;
+  const payTag = (o.payment_method||'').toLowerCase().includes('transfer')
+    ? `<span class="order-tag transfer"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg> Transfer</span>`
+    : `<span class="order-tag cash"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> Cash</span>`;
   const actions = withActions ? `
     <div class="order-actions">
-      ${o.status === 'new' ? `<button class="action-btn primary" onclick="updateOrderStatus('${o.id}','processing')">▶ Process</button>` : ''}
-      ${o.status === 'processing' ? `<button class="action-btn primary" onclick="updateOrderStatus('${o.id}','done')">✓ Mark Done</button>` : ''}
-      ${o.status !== 'cancelled' && o.status !== 'done' ? `<button class="action-btn danger" onclick="updateOrderStatus('${o.id}','cancelled')">Cancel</button>` : ''}
+      ${o.status === 'new' ? `<button class="action-btn primary" onclick="updateOrderStatus('${o.id}','processing')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"/></svg> Process</button>` : ''}
+      ${o.status === 'processing' ? `<button class="action-btn primary" onclick="updateOrderStatus('${o.id}','done')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg> Mark Done</button>` : ''}
+      ${o.status !== 'cancelled' && o.status !== 'done' ? `<button class="action-btn danger" onclick="updateOrderStatus('${o.id}','cancelled')"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> Cancel</button>` : ''}
     </div>` : '';
   return `<div class="order-card" id="order-${o.id}">
     <div class="order-top">
@@ -1521,11 +1504,6 @@ async function loadBroadcast(){
   } catch(e){ console.warn('broadcast:', e); }
 }
 
-function selectTemplate(el, id){
-  SEL_TEMPLATE = id;
-  document.querySelectorAll('.bc-template').forEach(t=>t.classList.remove('selected'));
-  el.classList.add('selected');
-}
 function selectAudience(el, val){
   SEL_AUDIENCE = val;
   document.querySelectorAll('.bc-audience-opt').forEach(t=>t.classList.remove('selected'));
@@ -1542,7 +1520,7 @@ async function sendBroadcast(){
       method:'POST',
       body: JSON.stringify({
         client_id: CLIENT.id,
-        template_name: SEL_TEMPLATE,
+        template_name: 'free-form',
         message: msg,
         audience: SEL_AUDIENCE,
         sent_count: 0,
@@ -1551,7 +1529,7 @@ async function sendBroadcast(){
       })
     });
     document.getElementById('bc-message').value = '';
-    toast('Broadcast queued! ✅', 'success');
+    toast('Broadcast queued!', 'success');
     loadBroadcast();
   } catch(e){ toast('Failed to queue broadcast', 'error'); }
 }
@@ -1604,10 +1582,76 @@ function toast(msg, type='info'){
   const wrap = document.getElementById('toast-wrap');
   const el = document.createElement('div');
   el.className = `toast ${type}`;
-  const icons = { success:'✅', error:'❌', info:'ℹ️' };
+  const icons = {
+    success: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+    error:   `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--danger)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+    info:    `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--info)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  };
   el.innerHTML = `<span>${icons[type]||''}</span><span>${msg}</span>`;
   wrap.appendChild(el);
   setTimeout(()=>{ el.style.opacity='0'; el.style.transform='translateX(20px)'; el.style.transition='.3s'; setTimeout(()=>el.remove(),300); }, 3000);
+}
+
+// ══════════════════════════════════════════════════════════
+// NOTIFICATIONS + POLLING
+// ══════════════════════════════════════════════════════════
+let _lastOrderId  = null;
+let _lastMsgId    = null;
+let _pollInterval = null;
+
+function requestNotifPermission(){
+  if('Notification' in window && Notification.permission === 'default'){
+    Notification.requestPermission();
+  }
+}
+
+function fireNotif(title, body, icon){
+  if(!('Notification' in window) || Notification.permission !== 'granted') return;
+  try {
+    new Notification(title, { body, icon: icon || '/favicon.ico', badge: '/favicon.ico' });
+  } catch(e){}
+}
+
+async function pollForUpdates(){
+  if(!CLIENT) return;
+  try {
+    // Check for new orders
+    const orders = await supa(`orders?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=1`).catch(()=>[]);
+    const latestOrder = orders && orders[0];
+    if(latestOrder){
+      if(_lastOrderId === null){ _lastOrderId = latestOrder.id; }
+      else if(latestOrder.id !== _lastOrderId){
+        _lastOrderId = latestOrder.id;
+        const name = latestOrder.customer_name || latestOrder.customer_phone || 'Customer';
+        const amt  = parseFloat(latestOrder.total_amount||0).toFixed(2);
+        fireNotif('New Order — QBotMY', `${name} · RM ${amt}`, null);
+        toast(`New order from ${name}`, 'success');
+        // Refresh orders if on that page
+        if(currentPage === 'orders') loadOrders();
+        if(currentPage === 'dashboard') Promise.all([loadDashStats(), loadDashOrders()]);
+      }
+    }
+
+    // Check for new messages
+    const msgs = await supa(`message_logs?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=1`).catch(()=>[]);
+    const latestMsg = msgs && msgs[0];
+    if(latestMsg){
+      if(_lastMsgId === null){ _lastMsgId = latestMsg.id; }
+      else if(latestMsg.id !== _lastMsgId){
+        _lastMsgId = latestMsg.id;
+        const phone = latestMsg.customer_phone || 'Unknown';
+        fireNotif('New Chat — QBotMY', `Message from ${phone}`, null);
+        // Refresh messages if on that page
+        if(currentPage === 'messages') loadMessages();
+      }
+    }
+  } catch(e){}
+}
+
+function startPolling(){
+  if(_pollInterval) clearInterval(_pollInterval);
+  pollForUpdates(); // seed baseline IDs immediately
+  _pollInterval = setInterval(pollForUpdates, 30000); // every 30s
 }
 
 // ══════════════════════════════════════════════════════════
