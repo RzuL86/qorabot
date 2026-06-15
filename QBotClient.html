@@ -757,92 +757,6 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     </div>
 
     <!-- ── BROADCAST ── -->
-    <div class="page" id="page-broadcast">
-      <div class="sh">
-        <div class="sh-title" data-i18n="nav_blast">Broadcast</div>
-        <div class="sh-sub" data-i18n="blast_sub">Send promotions to your customers via WhatsApp</div>
-      </div>
-
-      <!-- Stats -->
-      <div class="bc-stats-row">
-        <div class="bc-stat">
-          <div class="bc-stat-val" id="bc-stat-total">—</div>
-          <div class="bc-stat-label" data-i18n="blast_total_customers">Total Customers</div>
-        </div>
-        <div class="bc-stat">
-          <div class="bc-stat-val" id="bc-stat-blasts">—</div>
-          <div class="bc-stat-label" data-i18n="blast_blasts_sent">Blasts Sent</div>
-        </div>
-        <div class="bc-stat">
-          <div class="bc-stat-val" id="bc-stat-remaining">—</div>
-          <div class="bc-stat-label" data-i18n="blast_remaining">Remaining</div>
-        </div>
-      </div>
-
-      <!-- Compose -->
-      <div class="card">
-        <div class="card-head">
-          <div class="card-head-title">
-            <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            <span data-i18n="blast_new">New Broadcast</span>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="fl">
-            <label class="fl-label" data-i18n="blast_your_message">Your Message / Promo Details</label>
-            <textarea id="bc-message" class="fl-input" rows="3" data-i18n-placeholder="blast_msg_ph" placeholder="Contoh: Diskaun 20% untuk semua menu hari ini sahaja!"></textarea>
-          </div>
-
-          <div class="fl-label" style="margin-bottom:10px;" data-i18n="blast_target">Target Audience</div>
-          <div class="bc-audience">
-            <label class="bc-audience-opt selected" onclick="selectAudience(this,'all')">
-              <input type="radio" name="audience" value="all" checked>
-              <div>
-                <div class="bc-audience-label" data-i18n="blast_aud_all">All Customers</div>
-                <div class="bc-audience-sub" data-i18n="blast_aud_all_sub">Everyone who has chatted with your bot</div>
-              </div>
-            </label>
-            <label class="bc-audience-opt" onclick="selectAudience(this,'30d')">
-              <input type="radio" name="audience" value="30d">
-              <div>
-                <div class="bc-audience-label" data-i18n="blast_aud_30d">Active — Last 30 Days</div>
-                <div class="bc-audience-sub" data-i18n="blast_aud_30d_sub">Customers who messaged in the past month</div>
-              </div>
-            </label>
-            <label class="bc-audience-opt" onclick="selectAudience(this,'ordered')">
-              <input type="radio" name="audience" value="ordered">
-              <div>
-                <div class="bc-audience-label" data-i18n="blast_aud_ordered">Customers Who Ordered</div>
-                <div class="bc-audience-sub" data-i18n="blast_aud_ordered_sub">Only confirmed order customers</div>
-              </div>
-            </label>
-          </div>
-
-          <button class="btn-login" onclick="sendBroadcast()" style="margin-top:4px;">
-            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-            <span data-i18n="blast_send_btn">Send Blast</span>
-          </button>
-        </div>
-      </div>
-
-      <!-- History -->
-      <div class="card">
-        <div class="card-head">
-          <div class="card-head-title">
-            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-            <span data-i18n="blast_history">Blast History</span>
-          </div>
-        </div>
-        <div class="card-body" id="bc-history">
-          <div class="empty">
-            <div class="empty-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div>
-            <div class="empty-text" data-i18n="blast_no_history">No broadcasts sent yet</div>
-            <div class="empty-sub" data-i18n="blast_no_history_sub">Your blast history will appear here</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- ── SUBSCRIPTION ── -->
     <div class="page" id="page-subscription">
       <div class="sh">
@@ -932,10 +846,7 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span data-i18n="nav_orders">Orders</span>
     </button>
-    <button class="bn-item" onclick="showPage('broadcast')" id="bn-broadcast">
-      <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-      <span data-i18n="nav_blast">Blast</span>
-    </button>
+
     <button class="bn-item" onclick="showPage('messages')" id="bn-messages">
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span data-i18n="nav_messages">Chats</span>
@@ -979,6 +890,7 @@ const supa = async (path, opts={}) => {
 let CLIENT = null;   // clients row
 let BOT    = null;   // bot_controls row
 let ORDERS = [];
+let ORDERS_LOADED = false; // true only after full loadOrders() (not dash preview)
 let MSGS   = [];
 let ORDER_FILTER = 'all';
 let SEL_TEMPLATE = 'promo';
@@ -1150,7 +1062,9 @@ async function tryLogin(){
 
 function logout(){
   localStorage.removeItem('qbotclient_session');
-  CLIENT = null; BOT = null; ORDERS = []; MSGS = [];
+  if(_pollInterval){ clearInterval(_pollInterval); _pollInterval = null; }
+  _lastOrderId = null; _lastMsgId = null;
+  CLIENT = null; BOT = null; ORDERS = []; ORDERS_LOADED = false; MSGS = [];
   document.getElementById('app').style.display = 'none';
   document.getElementById('login-screen').style.display = 'flex';
   document.getElementById('login-phone').value = '';
@@ -1295,6 +1209,7 @@ async function loadOrders(){
   try {
     const rows = await supa(`orders?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=100`);
     ORDERS = rows || [];
+    ORDERS_LOADED = true;
     renderOrders('orders-list');
   } catch(e){
     document.getElementById('orders-list').innerHTML = '<div class="empty"><div class="empty-text">Could not load orders</div></div>';
@@ -1539,9 +1454,8 @@ async function sendBroadcast(){
 // ══════════════════════════════════════════════════════════
 const pageLoaders = {
   dashboard:    () => Promise.all([loadBotStatus(), loadDashStats(), loadDashOrders()]),
-  orders:       loadOrders,
+  orders:       () => { if(!ORDERS_LOADED) loadOrders(); else renderOrders('orders-list'); },
   messages:     loadMessages,
-  broadcast:    loadBroadcast,
   subscription: loadSubscription,
 };
 
