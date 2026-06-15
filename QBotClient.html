@@ -776,27 +776,27 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     <!-- ── STATS ── -->
     <div class="page" id="page-stats">
       <div class="sh">
-        <div class="sh-title">Revenue Statistics</div>
-        <div class="sh-sub">Sales performance from your WhatsApp bot orders</div>
+        <div class="sh-title" data-i18n="stats_title">Revenue Statistics</div>
+        <div class="sh-sub" data-i18n="stats_sub">Sales performance from your WhatsApp bot orders</div>
       </div>
 
       <!-- Period selector -->
       <div class="stats-period-row">
-        <button class="period-btn active" onclick="setStatsPeriod('daily',this)">Daily</button>
-        <button class="period-btn" onclick="setStatsPeriod('weekly',this)">Weekly</button>
-        <button class="period-btn" onclick="setStatsPeriod('monthly',this)">Monthly</button>
-        <button class="period-btn" onclick="setStatsPeriod('yearly',this)">Yearly</button>
+        <button class="period-btn active" onclick="setStatsPeriod('daily',this)" data-i18n="stats_period_daily">Daily</button>
+        <button class="period-btn" onclick="setStatsPeriod('weekly',this)" data-i18n="stats_period_weekly">Weekly</button>
+        <button class="period-btn" onclick="setStatsPeriod('monthly',this)" data-i18n="stats_period_monthly">Monthly</button>
+        <button class="period-btn" onclick="setStatsPeriod('yearly',this)" data-i18n="stats_period_yearly">Yearly</button>
       </div>
 
       <!-- Export buttons -->
       <div class="export-row">
         <button class="export-btn" onclick="exportCSV()">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          CSV / Google Sheets
+          <span data-i18n="stats_export_csv">CSV / Google Sheets</span>
         </button>
         <button class="export-btn" onclick="exportPDF()">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h1a2 2 0 0 1 0 4H9v-4z"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>
-          Download PDF
+          <span data-i18n="stats_export_pdf">Download PDF</span>
         </button>
       </div>
 
@@ -806,22 +806,22 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
         <!-- Summary cards -->
         <div class="stats-summary-row" id="stats-summary-row">
           <div class="stats-sum-card">
-            <div class="stats-sum-label">Total Revenue</div>
+            <div class="stats-sum-label" data-i18n="stats_total_revenue">Total Revenue</div>
             <div class="stats-sum-val" id="stats-total-revenue">—</div>
             <div class="stats-sum-sub" id="stats-period-label">—</div>
           </div>
           <div class="stats-sum-card">
-            <div class="stats-sum-label">Total Orders</div>
+            <div class="stats-sum-label" data-i18n="stats_total_orders">Total Orders</div>
             <div class="stats-sum-val" id="stats-total-orders">—</div>
             <div class="stats-sum-sub" id="stats-avg-order">Avg —</div>
           </div>
           <div class="stats-sum-card">
-            <div class="stats-sum-label">Best Period</div>
+            <div class="stats-sum-label" data-i18n="stats_best_period">Best Period</div>
             <div class="stats-sum-val" id="stats-best-val">—</div>
             <div class="stats-sum-sub" id="stats-best-label">—</div>
           </div>
           <div class="stats-sum-card">
-            <div class="stats-sum-label">Avg / Period</div>
+            <div class="stats-sum-label" data-i18n="stats_avg_period">Avg / Period</div>
             <div class="stats-sum-val" id="stats-avg-period">—</div>
             <div class="stats-sum-sub" id="stats-avg-sub">—</div>
           </div>
@@ -1010,6 +1010,11 @@ const LANG_DICT = {
     plan_update_pw_btn:'Update Password', plan_payment_history:'Payment History',
     plan_upgrade_prompt:'Need to upgrade or renew?',
     plan_upgrade_link:'Contact Qoratech on Telegram →',
+    stats_title:'Revenue Statistics', stats_sub:'Sales performance from your WhatsApp bot orders',
+    stats_period_daily:'Daily', stats_period_weekly:'Weekly', stats_period_monthly:'Monthly', stats_period_yearly:'Yearly',
+    stats_export_csv:'CSV / Google Sheets', stats_export_pdf:'Download PDF',
+    stats_total_revenue:'Total Revenue', stats_total_orders:'Total Orders',
+    stats_best_period:'Best Period', stats_avg_period:'Avg / Period',
   },
   bm: {
     nav_home:'Utama', nav_orders:'Pesanan',
@@ -1033,6 +1038,11 @@ const LANG_DICT = {
     plan_update_pw_btn:'Kemaskini Kata Laluan', plan_payment_history:'Sejarah Pembayaran',
     plan_upgrade_prompt:'Perlu naik taraf atau memperbaharui?',
     plan_upgrade_link:'Hubungi Qoratech di Telegram →',
+    stats_title:'Statistik Pendapatan', stats_sub:'Prestasi jualan daripada bot WhatsApp anda',
+    stats_period_daily:'Harian', stats_period_weekly:'Minggu', stats_period_monthly:'Bulanan', stats_period_yearly:'Tahunan',
+    stats_export_csv:'CSV / Google Sheets', stats_export_pdf:'Muat Turun PDF',
+    stats_total_revenue:'Jumlah Pendapatan', stats_total_orders:'Jumlah Pesanan',
+    stats_best_period:'Tempoh Terbaik', stats_avg_period:'Purata / Tempoh',
   }
 };
 
@@ -1055,6 +1065,10 @@ function setLang(lang){
   LANG = lang;
   localStorage.setItem('qbotclient_lang', lang);
   applyLang(lang);
+  // Re-render dynamically-generated stats text (not covered by data-i18n)
+  if(STATS_DATA && document.getElementById('page-stats') && document.getElementById('page-stats').classList.contains('active')){
+    renderStats();
+  }
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1458,7 +1472,7 @@ let STATS_PERIOD = 'daily';
 let STATS_DATA   = [];   // raw orders for current period
 
 async function loadStats(){
-  document.getElementById('chart-svg-wrap').innerHTML = '<div class="chart-empty">Loading…</div>';
+  document.getElementById('chart-svg-wrap').innerHTML = '<div class="chart-empty">' + (LANG==='bm' ? 'Memuatkan…' : 'Loading…') + '</div>';
   try {
     // Fetch enough history depending on period
     const periodDays = { daily:30, weekly:84, monthly:365, yearly:1825 };
@@ -1473,7 +1487,7 @@ async function loadStats(){
     STATS_DATA = rows || [];
     renderStats();
   } catch(e){
-    document.getElementById('chart-svg-wrap').innerHTML = '<div class="chart-empty">Could not load data</div>';
+    document.getElementById('chart-svg-wrap').innerHTML = '<div class="chart-empty">' + (LANG==='bm' ? 'Tidak dapat memuatkan data' : 'Could not load data') + '</div>';
   }
 }
 
@@ -1497,17 +1511,26 @@ function renderStats(){
   const bestIdx    = values.indexOf(maxVal);
   const avgPeriod  = values.filter(v=>v>0).length ? totalRev / values.filter(v=>v>0).length : 0;
 
-  const periodNames = { daily:'Last 30 Days', weekly:'Last 12 Weeks', monthly:'Last 12 Months', yearly:'All Years' };
+  const periodNames = LANG==='bm'
+    ? { daily:'30 Hari Lepas', weekly:'12 Minggu Lepas', monthly:'12 Bulan Lepas', yearly:'Semua Tahun' }
+    : { daily:'Last 30 Days', weekly:'Last 12 Weeks', monthly:'Last 12 Months', yearly:'All Years' };
+  const chartTitles = LANG==='bm'
+    ? { daily:'Pendapatan Harian', weekly:'Pendapatan Minggu', monthly:'Pendapatan Bulanan', yearly:'Pendapatan Tahunan' }
+    : { daily:'Daily Revenue', weekly:'Weekly Revenue', monthly:'Monthly Revenue', yearly:'Yearly Revenue' };
+  const avgLabel = LANG==='bm' ? 'Purata ' : 'Avg ';
 
   document.getElementById('stats-total-revenue').textContent = 'RM ' + totalRev.toFixed(2);
   document.getElementById('stats-period-label').textContent  = periodNames[STATS_PERIOD];
   document.getElementById('stats-total-orders').textContent  = totalOrders;
-  document.getElementById('stats-avg-order').textContent     = 'Avg RM ' + avgOrder.toFixed(2);
+  document.getElementById('stats-avg-order').textContent     = avgLabel + 'RM ' + avgOrder.toFixed(2);
   document.getElementById('stats-best-val').textContent      = bestIdx >= 0 ? 'RM ' + maxVal.toFixed(2) : '—';
   document.getElementById('stats-best-label').textContent    = bestIdx >= 0 ? labels[bestIdx] : '—';
   document.getElementById('stats-avg-period').textContent    = 'RM ' + avgPeriod.toFixed(2);
-  document.getElementById('stats-avg-sub').textContent       = 'per active ' + STATS_PERIOD.replace('ly','');
-  document.getElementById('chart-title').textContent         = { daily:'Daily Revenue', weekly:'Weekly Revenue', monthly:'Monthly Revenue', yearly:'Yearly Revenue' }[STATS_PERIOD];
+  const periodUnitNames = { daily:'day', weekly:'week', monthly:'month', yearly:'year' };
+  const periodUnitNamesBM = { daily:'hari', weekly:'minggu', monthly:'bulan', yearly:'tahun' };
+  const unitName = (LANG==='bm' ? periodUnitNamesBM : periodUnitNames)[STATS_PERIOD] || STATS_PERIOD;
+  document.getElementById('stats-avg-sub').textContent       = (LANG==='bm' ? 'setiap ' : 'per active ') + (LANG==='bm' ? unitName + ' aktif' : 'active ' + unitName);
+  document.getElementById('chart-title').textContent         = chartTitles[STATS_PERIOD];
   document.getElementById('chart-range-label').textContent   = periodNames[STATS_PERIOD];
 
   renderBarChart(labels, values, 'chart-svg-wrap');
@@ -1517,58 +1540,75 @@ function buildBuckets(orders, period){
   const now = new Date();
   const buckets = [];
 
+  // Malaysia is UTC+8 with no DST. Convert any UTC timestamp to MY local
+  // by adding 8 hours, then read date parts via the UTC getters (which now
+  // represent MY local time). Matches toMYT() in QBotAdmin.html for
+  // consistent date bucketing across admin and client dashboards.
+  const toMY = (d) => {
+    if(!d) return new Date();
+    const s = String(d);
+    const utc = s.endsWith('Z') || s.includes('+') ? s : s + '+00:00';
+    return new Date(new Date(utc).getTime() + 8*60*60*1000);
+  };
+  const myKeyDay   = (d) => d.toISOString().slice(0,10); // YYYY-MM-DD (MY local)
+  const myKeyMonth = (d) => d.toISOString().slice(0,7);  // YYYY-MM (MY local)
+  const myKeyYear  = (d) => d.toISOString().slice(0,4);  // YYYY (MY local)
+
+  // "now" expressed in MY local time
+  const nowMY = toMY(now.toISOString());
+
   if(period === 'daily'){
     for(let i=29; i>=0; i--){
-      const d = new Date(now); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
-      const key = d.toISOString().slice(0,10);
-      const label = d.toLocaleDateString('en-MY',{day:'2-digit',month:'short'});
+      const d = new Date(nowMY); d.setUTCDate(d.getUTCDate()-i); d.setUTCHours(0,0,0,0);
+      const key = myKeyDay(d);
+      const label = d.toLocaleDateString('en-MY',{day:'2-digit',month:'short',timeZone:'UTC'});
       buckets.push({ key, label, revenue:0, count:0 });
     }
     orders.forEach(o => {
-      const key = o.created_at.slice(0,10);
+      const key = myKeyDay(toMY(o.created_at));
       const b = buckets.find(b=>b.key===key);
       if(b){ b.revenue += parseFloat(o.total_amount||0); b.count++; }
     });
 
   } else if(period === 'weekly'){
     for(let i=11; i>=0; i--){
-      const d = new Date(now);
-      d.setDate(d.getDate() - i*7 - d.getDay());
-      d.setHours(0,0,0,0);
-      const key = d.toISOString().slice(0,10);
-      const label = d.toLocaleDateString('en-MY',{day:'2-digit',month:'short'});
+      const d = new Date(nowMY);
+      d.setUTCDate(d.getUTCDate() - i*7 - d.getUTCDay());
+      d.setUTCHours(0,0,0,0);
+      const key = myKeyDay(d);
+      const label = d.toLocaleDateString('en-MY',{day:'2-digit',month:'short',timeZone:'UTC'});
       buckets.push({ key, label, revenue:0, count:0, weekStart: new Date(d) });
     }
     orders.forEach(o => {
-      const od = new Date(o.created_at);
+      const od = toMY(o.created_at);
       for(let i=buckets.length-1; i>=0; i--){
         const ws = buckets[i].weekStart;
-        const we = new Date(ws); we.setDate(we.getDate()+7);
+        const we = new Date(ws); we.setUTCDate(we.getUTCDate()+7);
         if(od >= ws && od < we){ buckets[i].revenue += parseFloat(o.total_amount||0); buckets[i].count++; break; }
       }
     });
 
   } else if(period === 'monthly'){
     for(let i=11; i>=0; i--){
-      const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
-      const key = d.toISOString().slice(0,7);
-      const label = d.toLocaleDateString('en-MY',{month:'short',year:'2-digit'});
+      const d = new Date(Date.UTC(nowMY.getUTCFullYear(), nowMY.getUTCMonth()-i, 1));
+      const key = myKeyMonth(d);
+      const label = d.toLocaleDateString('en-MY',{month:'short',year:'2-digit',timeZone:'UTC'});
       buckets.push({ key, label, revenue:0, count:0 });
     }
     orders.forEach(o => {
-      const key = o.created_at.slice(0,7);
+      const key = myKeyMonth(toMY(o.created_at));
       const b = buckets.find(b=>b.key===key);
       if(b){ b.revenue += parseFloat(o.total_amount||0); b.count++; }
     });
 
   } else if(period === 'yearly'){
-    const minYear = orders.length ? parseInt(orders[0].created_at.slice(0,4)) : now.getFullYear();
-    for(let y=minYear; y<=now.getFullYear(); y++){
+    const minYear = orders.length ? parseInt(myKeyYear(toMY(orders[0].created_at))) : nowMY.getUTCFullYear();
+    for(let y=minYear; y<=nowMY.getUTCFullYear(); y++){
       buckets.push({ key:String(y), label:String(y), revenue:0, count:0 });
     }
-    if(!buckets.length) buckets.push({ key:String(now.getFullYear()), label:String(now.getFullYear()), revenue:0, count:0 });
+    if(!buckets.length) buckets.push({ key:String(nowMY.getUTCFullYear()), label:String(nowMY.getUTCFullYear()), revenue:0, count:0 });
     orders.forEach(o => {
-      const key = o.created_at.slice(0,4);
+      const key = myKeyYear(toMY(o.created_at));
       const b = buckets.find(b=>b.key===key);
       if(b){ b.revenue += parseFloat(o.total_amount||0); b.count++; }
     });
@@ -1580,7 +1620,7 @@ function buildBuckets(orders, period){
 function renderBarChart(labels, values, containerId){
   const wrap = document.getElementById(containerId);
   if(!values.length || values.every(v=>v===0)){
-    wrap.innerHTML = '<div class="chart-empty">No revenue data for this period</div>';
+    wrap.innerHTML = '<div class="chart-empty">' + (LANG==='bm' ? 'Tiada data pendapatan untuk tempoh ini' : 'No revenue data for this period') + '</div>';
     return;
   }
 
@@ -1685,14 +1725,29 @@ function showPage(id){
 // ══════════════════════════════════════════════════════════
 // HELPERS
 // ══════════════════════════════════════════════════════════
+// Malaysia is UTC+8 with no DST. Matches toMYT()/fmtDate()/fmtTime()/fmtDT()
+// in QBotAdmin.html so order timestamps shown here always match the
+// timezone basis used for the revenue statistics buckets, regardless of
+// the viewing device's local timezone.
+function toMYT(d){
+  if(!d) return new Date();
+  const s = String(d);
+  const utc = s.endsWith('Z') || s.includes('+') ? s : s + '+00:00';
+  return new Date(new Date(utc).getTime() + 8*60*60*1000);
+}
+const MONTHS_EN = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
 function fmtDate(iso){
   if(!iso) return '—';
-  const d = new Date(iso);
-  return d.toLocaleDateString('en-MY',{day:'2-digit',month:'short',year:'numeric'});
+  const m = toMYT(iso);
+  return String(m.getUTCDate()).padStart(2,'0') + ' ' + MONTHS_EN[m.getUTCMonth()] + ' ' + m.getUTCFullYear();
 }
 function fmtTime(iso){
   if(!iso) return '';
-  return new Date(iso).toLocaleTimeString('en-MY',{hour:'2-digit',minute:'2-digit',hour12:true});
+  const m = toMYT(iso);
+  const h = m.getUTCHours();
+  const min = String(m.getUTCMinutes()).padStart(2,'0');
+  const ap = h>=12 ? 'pm' : 'am';
+  return (h%12||12) + ':' + min + ' ' + ap;
 }
 function fmtDateTime(iso){
   if(!iso) return '—';
