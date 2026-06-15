@@ -209,8 +209,8 @@ textarea.form-input{resize:vertical;}
 .bot-status-dot{width:6px;height:6px;border-radius:50%;background:currentColor;}
 
 /* BIG POWER TOGGLE */
-.power-toggle{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;}
-.power-btn{width:52px;height:52px;border-radius:50%;border:2px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;position:relative;}
+.power-toggle{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:8px;margin:-8px;-webkit-tap-highlight-color:transparent;user-select:none;}
+.power-btn{width:52px;height:52px;border-radius:50%;border:2px solid var(--border2);background:var(--bg3);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .25s;position:relative;touch-action:manipulation;pointer-events:none;}
 .power-btn.on{border-color:var(--accent);background:rgba(37,211,102,.12);box-shadow:0 0 0 4px rgba(37,211,102,.1);}
 .power-btn.off{border-color:var(--danger);background:rgba(239,68,68,.08);box-shadow:0 0 0 4px rgba(239,68,68,.08);}
 .power-btn svg{transition:stroke .25s;}
@@ -2546,7 +2546,7 @@ async function loadBotControls(){
             </div>
           </div>
         </div>
-        <div class="power-toggle" onclick="toggleBot('${c.id}',${!running},'${ctrl?.id||''}')">
+        <div class="power-toggle" data-client-id="${c.id}" data-control-id="${ctrl?.id||''}" onclick="handleToggleBot(this)">
           <div class="power-btn ${running?'on':'off'}" id="pbtn-${c.id}">
             <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
               <path d="M18.36 6.64a9 9 0 1 1-12.73 0"/><line x1="12" y1="2" x2="12" y2="12"/>
@@ -2559,7 +2559,16 @@ async function loadBotControls(){
   }catch(e){document.getElementById('bot-controls-list').innerHTML=`<div style="color:var(--danger);padding:16px">Error: ${e.message}</div>`;}
 }
 
-async function toggleBot(clientId,active,controlId){
+function handleToggleBot(el){
+  // Read current state from DOM at click time — never from stale closure
+  const clientId=el.dataset.clientId;
+  const controlId=el.dataset.controlId||'';
+  const pbtn=document.getElementById(`pbtn-${clientId}`);
+  const currentlyOn=pbtn&&pbtn.classList.contains('on');
+  toggleBot(clientId,!currentlyOn,controlId,el);
+}
+
+async function toggleBot(clientId,active,controlId,toggleEl){
   // Instant UI update
   const card=document.getElementById(`bot-card-${clientId}`);
   const pbtn=document.getElementById(`pbtn-${clientId}`);
@@ -2574,8 +2583,13 @@ async function toggleBot(clientId,active,controlId){
   if(pbtn){pbtn.className=`power-btn ${active?'on':'off'}`;}
   if(plbl){plbl.className=`power-label ${active?'on':'off'}`;plbl.textContent=active?'ON':'OFF';}
   try{
-    if(controlId){await sbPatch('bot_controls',controlId,{is_paused:!active});}
-    else{await sb('bot_controls',{method:'POST',body:{client_id:clientId,is_paused:!active}});}
+    if(controlId){
+      await sbPatch('bot_controls',controlId,{is_paused:!active});
+    }else{
+      // New row — capture returned id and store it so next click uses PATCH not POST
+      const res=await sb('bot_controls',{method:'POST',body:{client_id:clientId,is_paused:!active}});
+      if(res&&res[0]&&res[0].id&&toggleEl){toggleEl.dataset.controlId=res[0].id;}
+    }
     toast(`Bot ${active?'Resumed':'Paused'}`,'success');
   }catch(e){toast('Failed: '+e.message,'error');loadBotControls();}
 }
