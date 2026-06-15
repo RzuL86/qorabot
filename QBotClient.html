@@ -432,38 +432,6 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
 .spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;margin:32px auto;display:block;}
 @keyframes spin{to{transform:rotate(360deg);}}
 
-/* ── BROADCAST COMPOSE ── */
-
-.bc-audience{display:flex;flex-direction:column;gap:8px;margin-bottom:16px;}
-.bc-audience-opt{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 14px;border-radius:9px;
-  border:1px solid var(--border2);background:var(--bg3);
-  cursor:pointer;transition:border-color .2s;
-}
-.bc-audience-opt:hover,.bc-audience-opt.selected{border-color:var(--accent);}
-.bc-audience-opt.selected{background:var(--accent-dim);}
-.bc-audience-opt input[type=radio]{accent-color:var(--accent);}
-.bc-audience-label{font-size:13px;font-weight:500;}
-.bc-audience-sub{font-size:11px;color:var(--text3);}
-
-.bc-stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px;}
-.bc-stat{background:var(--bg3);border-radius:9px;padding:12px;text-align:center;border:1px solid var(--border);}
-.bc-stat-val{font-size:20px;font-weight:800;font-family:'Courier New',monospace;color:var(--accent);margin-bottom:3px;}
-.bc-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.5px;font-family:'Courier New',monospace;}
-
-/* HISTORY LOG ITEM */
-.bc-history-item{
-  padding:12px 0;border-bottom:1px solid var(--border);
-  display:flex;align-items:center;justify-content:space-between;gap:12px;
-}
-.bc-history-item:last-child{border-bottom:none;}
-.bc-h-name{font-size:13px;font-weight:600;margin-bottom:2px;}
-.bc-h-meta{font-size:11px;color:var(--text3);font-family:'Courier New',monospace;}
-.bc-h-right{text-align:right;}
-.bc-h-count{font-family:'Courier New',monospace;font-size:13px;font-weight:700;color:var(--accent);}
-.bc-h-time{font-size:10px;color:var(--text3);}
-
 /* ── LANGUAGE TOGGLE ── */
 .lang-toggle{display:flex;gap:4px;align-items:center;}
 .lang-card{
@@ -517,15 +485,6 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
   .plan-meta-item{padding:9px 10px;}
   .plan-name{font-size:18px;}
 
-  /* Broadcast stats — 3 col fits but tighten */
-  .bc-stats-row{grid-template-columns:repeat(3,1fr);gap:6px;}
-  .bc-stat{padding:10px 8px;}
-  .bc-stat-val{font-size:17px;}
-  .bc-stat-label{font-size:9px;}
-
-  /* Broadcast audience options — full touch target */
-  .bc-audience-opt{padding:12px 12px;min-height:52px;}
-
   /* Section header */
   .sh-title{font-size:16px;}
 
@@ -563,6 +522,63 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
   .topbar{padding:0 28px;}
   .main{padding:24px;padding-bottom:32px;}
   .plan-meta-row{grid-template-columns:1fr 1fr;}
+}
+
+/* ── STATS PAGE ── */
+.stats-period-row{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;}
+.period-btn{
+  flex-shrink:0;padding:7px 16px;border-radius:20px;font-size:12px;font-weight:700;
+  font-family:'Courier New',monospace;letter-spacing:.4px;
+  border:1px solid var(--border2);background:var(--bg3);color:var(--text2);
+  cursor:pointer;transition:all .15s;
+}
+.period-btn.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-border);}
+.chart-wrap{
+  background:var(--bg2);border:1px solid var(--border);border-radius:13px;
+  padding:18px 16px 10px;margin-bottom:14px;box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.chart-title-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.chart-title{font-size:13px;font-weight:700;}
+.chart-total{font-size:11px;color:var(--text3);font-family:'Courier New',monospace;}
+.chart-svg-wrap{width:100%;overflow-x:auto;}
+.chart-svg-wrap svg{display:block;}
+.chart-bar{fill:var(--accent);opacity:.85;rx:3;transition:opacity .1s;}
+.chart-bar:hover{opacity:1;}
+.chart-label{font-size:9px;fill:var(--text3);font-family:'Courier New',monospace;text-anchor:middle;}
+.chart-yval{font-size:9px;fill:var(--text3);font-family:'Courier New',monospace;text-anchor:end;}
+.chart-grid{stroke:var(--border);stroke-width:.5;}
+.chart-empty{text-align:center;padding:40px 0;color:var(--text3);font-size:13px;}
+.stats-summary-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+.stats-sum-card{
+  background:var(--bg2);border:1px solid var(--border);border-radius:11px;
+  padding:14px 16px;box-shadow:var(--shadow);
+}
+.stats-sum-label{font-size:10px;color:var(--text3);font-family:'Courier New',monospace;letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;}
+.stats-sum-val{font-size:20px;font-weight:800;color:var(--accent);}
+.stats-sum-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.export-row{display:flex;gap:8px;margin-bottom:20px;}
+.export-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:7px;
+  padding:10px 12px;border-radius:9px;font-size:12px;font-weight:700;
+  border:1px solid var(--border2);background:var(--bg3);color:var(--text2);
+  cursor:pointer;transition:all .15s;
+}
+.export-btn:hover{border-color:var(--accent);color:var(--accent);}
+.export-btn svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+
+/* Print styles — only stats page content */
+@media print{
+  body *{visibility:hidden;}
+  #print-stats-area,#print-stats-area *{visibility:visible;}
+  #print-stats-area{position:fixed;top:0;left:0;width:100%;padding:24px;}
+  .chart-bar{fill:#25D366 !important;}
+  .chart-label,.chart-yval{fill:#555 !important;}
+  .chart-grid{stroke:#ddd !important;}
+  .chart-wrap{border:1px solid #ddd !important;background:#fff !important;}
+  .stats-sum-card{border:1px solid #ddd !important;background:#fff !important;}
+  .stats-sum-val{color:#25D366 !important;}
+  .stats-sum-label,.stats-sum-sub,.chart-total,.chart-title{color:#555 !important;}
 }
 </style>
 </head>
@@ -757,6 +773,74 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
     </div>
 
     <!-- ── BROADCAST ── -->
+    <!-- ── STATS ── -->
+    <div class="page" id="page-stats">
+      <div class="sh">
+        <div class="sh-title">Revenue Statistics</div>
+        <div class="sh-sub">Sales performance from your WhatsApp bot orders</div>
+      </div>
+
+      <!-- Period selector -->
+      <div class="stats-period-row">
+        <button class="period-btn active" onclick="setStatsPeriod('daily',this)">Daily</button>
+        <button class="period-btn" onclick="setStatsPeriod('weekly',this)">Weekly</button>
+        <button class="period-btn" onclick="setStatsPeriod('monthly',this)">Monthly</button>
+        <button class="period-btn" onclick="setStatsPeriod('yearly',this)">Yearly</button>
+      </div>
+
+      <!-- Export buttons -->
+      <div class="export-row">
+        <button class="export-btn" onclick="exportCSV()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          CSV / Google Sheets
+        </button>
+        <button class="export-btn" onclick="exportPDF()">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M9 13h1a2 2 0 0 1 0 4H9v-4z"/><path d="M14 13h2"/><path d="M14 17h2"/></svg>
+          Download PDF
+        </button>
+      </div>
+
+      <!-- Print-only area -->
+      <div id="print-stats-area">
+
+        <!-- Summary cards -->
+        <div class="stats-summary-row" id="stats-summary-row">
+          <div class="stats-sum-card">
+            <div class="stats-sum-label">Total Revenue</div>
+            <div class="stats-sum-val" id="stats-total-revenue">—</div>
+            <div class="stats-sum-sub" id="stats-period-label">—</div>
+          </div>
+          <div class="stats-sum-card">
+            <div class="stats-sum-label">Total Orders</div>
+            <div class="stats-sum-val" id="stats-total-orders">—</div>
+            <div class="stats-sum-sub" id="stats-avg-order">Avg —</div>
+          </div>
+          <div class="stats-sum-card">
+            <div class="stats-sum-label">Best Period</div>
+            <div class="stats-sum-val" id="stats-best-val">—</div>
+            <div class="stats-sum-sub" id="stats-best-label">—</div>
+          </div>
+          <div class="stats-sum-card">
+            <div class="stats-sum-label">Avg / Period</div>
+            <div class="stats-sum-val" id="stats-avg-period">—</div>
+            <div class="stats-sum-sub" id="stats-avg-sub">—</div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="chart-wrap" id="chart-wrap">
+          <div class="chart-title-row">
+            <div class="chart-title" id="chart-title">Revenue Chart</div>
+            <div class="chart-total" id="chart-range-label">—</div>
+          </div>
+          <div class="chart-svg-wrap" id="chart-svg-wrap">
+            <div class="chart-empty">Loading…</div>
+          </div>
+        </div>
+
+      </div><!-- /print-stats-area -->
+    </div>
+
     <!-- ── SUBSCRIPTION ── -->
     <div class="page" id="page-subscription">
       <div class="sh">
@@ -851,6 +935,10 @@ input:checked+.toggle-slider::after{transform:translateX(18px);}
       <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
       <span data-i18n="nav_messages">Chats</span>
     </button>
+    <button class="bn-item" onclick="showPage('stats')" id="bn-stats">
+      <svg viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span data-i18n="nav_stats">Stats</span>
+    </button>
     <button class="bn-item" onclick="showPage('subscription')" id="bn-subscription">
       <svg viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20"/></svg>
       <span data-i18n="nav_plan">Plan</span>
@@ -893,8 +981,6 @@ let ORDERS = [];
 let ORDERS_LOADED = false; // true only after full loadOrders() (not dash preview)
 let MSGS   = [];
 let ORDER_FILTER = 'all';
-let SEL_TEMPLATE = 'promo';
-let SEL_AUDIENCE = 'all';
 let currentPage  = 'dashboard';
 let LANG = localStorage.getItem('qbotclient_lang') || 'en';
 
@@ -903,8 +989,8 @@ let LANG = localStorage.getItem('qbotclient_lang') || 'en';
 // ══════════════════════════════════════════════════════════
 const LANG_DICT = {
   en: {
-    nav_home:'Home', nav_orders:'Orders', nav_blast:'Blast',
-    nav_messages:'Chats', nav_plan:'Plan',
+    nav_home:'Home', nav_orders:'Orders',
+    nav_messages:'Chats', nav_plan:'Plan', nav_stats:'Stats',
     stat_orders_today:'Orders Today', stat_revenue_today:'Revenue Today',
     stat_conversations:'Conversations', stat_unique_chats:'unique chats',
     stat_msgs_month:'Msgs This Month',
@@ -915,18 +1001,6 @@ const LANG_DICT = {
     filter_done:'Done', filter_cancelled:'Cancelled',
     messages_sub:'WhatsApp conversations handled by your bot',
     messages_search_ph:'Search by phone number…',
-    blast_sub:'Send promotions to your customers via WhatsApp',
-    blast_total_customers:'Total Customers', blast_blasts_sent:'Blasts Sent',
-    blast_remaining:'Remaining', blast_new:'New Broadcast',
-    blast_select_template:'Select Template',
-    blast_your_message:'Your Message / Promo Details',
-    blast_msg_ph:'E.g. 20% off all menu items today only!',
-    blast_target:'Target Audience',
-    blast_aud_all:'All Customers', blast_aud_all_sub:'Everyone who has chatted with your bot',
-    blast_aud_30d:'Active — Last 30 Days', blast_aud_30d_sub:'Customers who messaged in the past month',
-    blast_aud_ordered:'Customers Who Ordered', blast_aud_ordered_sub:'Only confirmed order customers',
-    blast_send_btn:'Send Blast', blast_history:'Blast History',
-    blast_no_history:'No broadcasts sent yet', blast_no_history_sub:'Your blast history will appear here',
     nav_plan:'Plan', plan_sub:'Your current plan and usage',
     plan_current:'CURRENT PLAN', plan_status:'Status', plan_renewal:'Renewal',
     plan_start:'Start Date', plan_msgs_month:'Messages / Month',
@@ -938,8 +1012,8 @@ const LANG_DICT = {
     plan_upgrade_link:'Contact Qoratech on Telegram →',
   },
   bm: {
-    nav_home:'Utama', nav_orders:'Pesanan', nav_blast:'Serbar',
-    nav_messages:'Sembang', nav_plan:'Pelan',
+    nav_home:'Utama', nav_orders:'Pesanan',
+    nav_messages:'Sembang', nav_plan:'Pelan', nav_stats:'Statistik',
     stat_orders_today:'Pesanan Hari Ini', stat_revenue_today:'Pendapatan Hari Ini',
     stat_conversations:'Perbualan', stat_unique_chats:'sembang unik',
     stat_msgs_month:'Mesej Bulan Ini',
@@ -950,18 +1024,6 @@ const LANG_DICT = {
     filter_done:'Selesai', filter_cancelled:'Dibatalkan',
     messages_sub:'Perbualan WhatsApp yang dikendalikan oleh bot anda',
     messages_search_ph:'Cari mengikut nombor telefon…',
-    blast_sub:'Hantar promosi kepada pelanggan anda melalui WhatsApp',
-    blast_total_customers:'Jumlah Pelanggan', blast_blasts_sent:'Serbar Dihantar',
-    blast_remaining:'Berbaki', blast_new:'Serbar Baharu',
-    blast_select_template:'Pilih Templat',
-    blast_your_message:'Mesej / Butiran Promo Anda',
-    blast_msg_ph:'Contoh: Diskaun 20% untuk semua menu hari ini sahaja!',
-    blast_target:'Sasaran Pelanggan',
-    blast_aud_all:'Semua Pelanggan', blast_aud_all_sub:'Semua yang pernah berbual dengan bot anda',
-    blast_aud_30d:'Aktif — 30 Hari Lepas', blast_aud_30d_sub:'Pelanggan yang menghantar mesej dalam sebulan lepas',
-    blast_aud_ordered:'Pelanggan Yang Menempah', blast_aud_ordered_sub:'Hanya pelanggan dengan pesanan disahkan',
-    blast_send_btn:'Hantar Serbar', blast_history:'Sejarah Serbar',
-    blast_no_history:'Tiada serbar dihantar lagi', blast_no_history_sub:'Sejarah serbar anda akan dipaparkan di sini',
     nav_plan:'Pelan', plan_sub:'Pelan semasa dan penggunaan anda',
     plan_current:'PELAN SEMASA', plan_status:'Status', plan_renewal:'Pembaharuan',
     plan_start:'Tarikh Mula', plan_msgs_month:'Mesej / Bulan',
@@ -1179,8 +1241,10 @@ async function loadDashStats(){
 
     // Month revenue
     const ordersMonth = await supa(`orders?client_id=eq.${CLIENT.id}&created_at=gte.${monthISO}&select=total_amount,status`).catch(()=>[]);
-    const revenueMonth = ordersMonth.filter(o=>o.status!=='cancelled').reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
+    const confirmedMonth = ordersMonth.filter(o=>o.status!=='cancelled');
+    const revenueMonth = confirmedMonth.reduce((s,o)=>s+(parseFloat(o.total_amount)||0),0);
     document.getElementById('stat-revenue-sub').textContent = 'RM ' + revenueMonth.toFixed(2) + ' this month';
+    document.getElementById('stat-orders-delta').textContent = confirmedMonth.length + ' this month';
 
     // Unique conversations today
     const msgsToday = await supa(`message_logs?client_id=eq.${CLIENT.id}&created_at=gte.${todayISO}&select=customer_phone`).catch(()=>[]);
@@ -1388,65 +1452,211 @@ async function loadSubscription(){
 }
 
 // ══════════════════════════════════════════════════════════
-// BROADCAST
+// STATS PAGE
 // ══════════════════════════════════════════════════════════
-async function loadBroadcast(){
+let STATS_PERIOD = 'daily';
+let STATS_DATA   = [];   // raw orders for current period
+
+async function loadStats(){
+  document.getElementById('chart-svg-wrap').innerHTML = '<div class="chart-empty">Loading…</div>';
   try {
-    const msgs = await supa(`message_logs?client_id=eq.${CLIENT.id}&select=customer_phone`).catch(()=>[]);
-    const unique = new Set(msgs.map(m=>m.customer_phone)).size;
-    document.getElementById('bc-stat-total').textContent = unique;
+    // Fetch enough history depending on period
+    const periodDays = { daily:30, weekly:84, monthly:365, yearly:1825 };
+    const days = periodDays[STATS_PERIOD] || 30;
+    const fromDate = new Date();
+    fromDate.setDate(fromDate.getDate() - days);
+    const fromISO = fromDate.toISOString();
 
-    const blasts = await supa(`broadcasts?client_id=eq.${CLIENT.id}&order=created_at.desc&limit=10`).catch(()=>[]);
-    document.getElementById('bc-stat-blasts').textContent = blasts?.length || 0;
-    // Monthly limit demo
-    const monthBlasts = (blasts||[]).filter(b => new Date(b.created_at) > new Date(new Date().getFullYear(), new Date().getMonth(), 1));
-    const remaining = Math.max(0, 10 - monthBlasts.length);
-    document.getElementById('bc-stat-remaining').textContent = remaining;
-
-    const bhEl = document.getElementById('bc-history');
-    if(!blasts || !blasts.length){ bhEl.innerHTML = '<div class="empty"><div class="empty-icon"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg></div><div class="empty-text">No broadcasts sent yet</div><div class="empty-sub">Your blast history will appear here</div></div>'; return; }
-    bhEl.innerHTML = blasts.map(b => `
-      <div class="bc-history-item">
-        <div>
-          <div class="bc-h-name">${b.template_name||'Broadcast'}</div>
-          <div class="bc-h-meta">${b.audience||'all'} · ${fmtDate(b.created_at)}</div>
-        </div>
-        <div class="bc-h-right">
-          <div class="bc-h-count">${b.sent_count||0} sent</div>
-          <div class="bc-h-time">${fmtTime(b.created_at)}</div>
-        </div>
-      </div>`).join('');
-  } catch(e){ console.warn('broadcast:', e); }
+    const rows = await supa(
+      `orders?client_id=eq.${CLIENT.id}&created_at=gte.${fromISO}&status=neq.cancelled&select=total_amount,created_at&order=created_at.asc&limit=1000`
+    );
+    STATS_DATA = rows || [];
+    renderStats();
+  } catch(e){
+    document.getElementById('chart-svg-wrap').innerHTML = '<div class="chart-empty">Could not load data</div>';
+  }
 }
 
-function selectAudience(el, val){
-  SEL_AUDIENCE = val;
-  document.querySelectorAll('.bc-audience-opt').forEach(t=>t.classList.remove('selected'));
-  el.classList.add('selected');
+function setStatsPeriod(period, el){
+  STATS_PERIOD = period;
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  loadStats();
 }
 
-async function sendBroadcast(){
-  const msg = document.getElementById('bc-message').value.trim();
-  if(!msg){ toast('Please enter your promo message', 'error'); return; }
-  // In production: POST to n8n broadcast webhook
-  // For now: log to broadcasts table
-  try {
-    await supa('broadcasts', {
-      method:'POST',
-      body: JSON.stringify({
-        client_id: CLIENT.id,
-        template_name: 'free-form',
-        message: msg,
-        audience: SEL_AUDIENCE,
-        sent_count: 0,
-        status: 'queued',
-        created_at: new Date().toISOString()
-      })
+function renderStats(){
+  const buckets = buildBuckets(STATS_DATA, STATS_PERIOD);
+  const labels  = buckets.map(b => b.label);
+  const values  = buckets.map(b => b.revenue);
+  const counts  = buckets.map(b => b.count);
+
+  const totalRev   = values.reduce((s,v) => s+v, 0);
+  const totalOrders= counts.reduce((s,v) => s+v, 0);
+  const avgOrder   = totalOrders ? totalRev/totalOrders : 0;
+  const maxVal     = Math.max(...values, 0.01);
+  const bestIdx    = values.indexOf(maxVal);
+  const avgPeriod  = values.filter(v=>v>0).length ? totalRev / values.filter(v=>v>0).length : 0;
+
+  const periodNames = { daily:'Last 30 Days', weekly:'Last 12 Weeks', monthly:'Last 12 Months', yearly:'All Years' };
+
+  document.getElementById('stats-total-revenue').textContent = 'RM ' + totalRev.toFixed(2);
+  document.getElementById('stats-period-label').textContent  = periodNames[STATS_PERIOD];
+  document.getElementById('stats-total-orders').textContent  = totalOrders;
+  document.getElementById('stats-avg-order').textContent     = 'Avg RM ' + avgOrder.toFixed(2);
+  document.getElementById('stats-best-val').textContent      = bestIdx >= 0 ? 'RM ' + maxVal.toFixed(2) : '—';
+  document.getElementById('stats-best-label').textContent    = bestIdx >= 0 ? labels[bestIdx] : '—';
+  document.getElementById('stats-avg-period').textContent    = 'RM ' + avgPeriod.toFixed(2);
+  document.getElementById('stats-avg-sub').textContent       = 'per active ' + STATS_PERIOD.replace('ly','');
+  document.getElementById('chart-title').textContent         = { daily:'Daily Revenue', weekly:'Weekly Revenue', monthly:'Monthly Revenue', yearly:'Yearly Revenue' }[STATS_PERIOD];
+  document.getElementById('chart-range-label').textContent   = periodNames[STATS_PERIOD];
+
+  renderBarChart(labels, values, 'chart-svg-wrap');
+}
+
+function buildBuckets(orders, period){
+  const now = new Date();
+  const buckets = [];
+
+  if(period === 'daily'){
+    for(let i=29; i>=0; i--){
+      const d = new Date(now); d.setDate(d.getDate()-i); d.setHours(0,0,0,0);
+      const key = d.toISOString().slice(0,10);
+      const label = d.toLocaleDateString('en-MY',{day:'2-digit',month:'short'});
+      buckets.push({ key, label, revenue:0, count:0 });
+    }
+    orders.forEach(o => {
+      const key = o.created_at.slice(0,10);
+      const b = buckets.find(b=>b.key===key);
+      if(b){ b.revenue += parseFloat(o.total_amount||0); b.count++; }
     });
-    document.getElementById('bc-message').value = '';
-    toast('Broadcast queued!', 'success');
-    loadBroadcast();
-  } catch(e){ toast('Failed to queue broadcast', 'error'); }
+
+  } else if(period === 'weekly'){
+    for(let i=11; i>=0; i--){
+      const d = new Date(now);
+      d.setDate(d.getDate() - i*7 - d.getDay());
+      d.setHours(0,0,0,0);
+      const key = d.toISOString().slice(0,10);
+      const label = d.toLocaleDateString('en-MY',{day:'2-digit',month:'short'});
+      buckets.push({ key, label, revenue:0, count:0, weekStart: new Date(d) });
+    }
+    orders.forEach(o => {
+      const od = new Date(o.created_at);
+      for(let i=buckets.length-1; i>=0; i--){
+        const ws = buckets[i].weekStart;
+        const we = new Date(ws); we.setDate(we.getDate()+7);
+        if(od >= ws && od < we){ buckets[i].revenue += parseFloat(o.total_amount||0); buckets[i].count++; break; }
+      }
+    });
+
+  } else if(period === 'monthly'){
+    for(let i=11; i>=0; i--){
+      const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+      const key = d.toISOString().slice(0,7);
+      const label = d.toLocaleDateString('en-MY',{month:'short',year:'2-digit'});
+      buckets.push({ key, label, revenue:0, count:0 });
+    }
+    orders.forEach(o => {
+      const key = o.created_at.slice(0,7);
+      const b = buckets.find(b=>b.key===key);
+      if(b){ b.revenue += parseFloat(o.total_amount||0); b.count++; }
+    });
+
+  } else if(period === 'yearly'){
+    const minYear = orders.length ? parseInt(orders[0].created_at.slice(0,4)) : now.getFullYear();
+    for(let y=minYear; y<=now.getFullYear(); y++){
+      buckets.push({ key:String(y), label:String(y), revenue:0, count:0 });
+    }
+    if(!buckets.length) buckets.push({ key:String(now.getFullYear()), label:String(now.getFullYear()), revenue:0, count:0 });
+    orders.forEach(o => {
+      const key = o.created_at.slice(0,4);
+      const b = buckets.find(b=>b.key===key);
+      if(b){ b.revenue += parseFloat(o.total_amount||0); b.count++; }
+    });
+  }
+
+  return buckets;
+}
+
+function renderBarChart(labels, values, containerId){
+  const wrap = document.getElementById(containerId);
+  if(!values.length || values.every(v=>v===0)){
+    wrap.innerHTML = '<div class="chart-empty">No revenue data for this period</div>';
+    return;
+  }
+
+  const W        = Math.max(labels.length * 36, 300);
+  const H        = 180;
+  const padL     = 44;
+  const padR     = 8;
+  const padT     = 10;
+  const padB     = 36;
+  const chartW   = W - padL - padR;
+  const chartH   = H - padT - padB;
+  const maxVal   = Math.max(...values);
+  const barW     = Math.max(8, chartW / labels.length - 5);
+  const gap      = chartW / labels.length;
+
+  // Y grid lines & labels (4 lines)
+  let gridSVG = '';
+  for(let i=0; i<=4; i++){
+    const y = padT + chartH - (i/4)*chartH;
+    const v = (maxVal * i/4);
+    const vLabel = v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0);
+    gridSVG += `<line class="chart-grid" x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}"/>`;
+    gridSVG += `<text class="chart-yval" x="${padL-4}" y="${y+3}">${vLabel}</text>`;
+  }
+
+  // Bars + labels
+  let barsSVG = '';
+  values.forEach((v, i) => {
+    const barH  = maxVal > 0 ? (v/maxVal)*chartH : 0;
+    const x     = padL + gap*i + (gap-barW)/2;
+    const y     = padT + chartH - barH;
+    const isMax = v === maxVal && v > 0;
+    barsSVG += `<rect class="chart-bar" x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${Math.max(barH,0).toFixed(1)}" rx="3" fill="${isMax?'var(--accent)':'rgba(37,211,102,.6)'}">
+      <title>${labels[i]}: RM ${v.toFixed(2)}</title>
+    </rect>`;
+    // Show value above bar if it has revenue
+    if(v > 0){
+      const vStr = v >= 1000 ? (v/1000).toFixed(1)+'k' : v.toFixed(0);
+      barsSVG += `<text class="chart-label" x="${(x+barW/2).toFixed(1)}" y="${(y-3).toFixed(1)}" style="font-size:8px;fill:var(--text2);">${vStr}</text>`;
+    }
+    barsSVG += `<text class="chart-label" x="${(x+barW/2).toFixed(1)}" y="${(padT+chartH+14).toFixed(1)}">${labels[i]}</text>`;
+  });
+
+  wrap.innerHTML = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="min-width:${W}px">
+    ${gridSVG}${barsSVG}
+  </svg>`;
+}
+
+// ── EXPORT CSV (Google Sheets compatible) ──
+function exportCSV(){
+  const buckets = buildBuckets(STATS_DATA, STATS_PERIOD);
+  const periodNames = { daily:'Daily', weekly:'Weekly', monthly:'Monthly', yearly:'Yearly' };
+  const businessName = CLIENT.business_name || CLIENT.name || 'Business';
+
+  let csv = `${businessName} — ${periodNames[STATS_PERIOD]} Revenue Report\n`;
+  csv += `Generated: ${new Date().toLocaleString('en-MY')}\n\n`;
+  csv += `Period,Revenue (RM),Orders\n`;
+  buckets.forEach(b => {
+    csv += `"${b.label}",${b.revenue.toFixed(2)},${b.count}\n`;
+  });
+  csv += `\nTOTAL,${buckets.reduce((s,b)=>s+b.revenue,0).toFixed(2)},${buckets.reduce((s,b)=>s+b.count,0)}\n`;
+
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = `${businessName.replace(/\s+/g,'-')}_${STATS_PERIOD}_revenue_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('CSV downloaded — open in Google Sheets', 'success');
+}
+
+// ── EXPORT PDF (print dialog) ──
+function exportPDF(){
+  toast('Opening print dialog…', 'info');
+  setTimeout(() => window.print(), 400);
 }
 
 // ══════════════════════════════════════════════════════════
@@ -1456,6 +1666,7 @@ const pageLoaders = {
   dashboard:    () => Promise.all([loadBotStatus(), loadDashStats(), loadDashOrders()]),
   orders:       () => { if(!ORDERS_LOADED) loadOrders(); else renderOrders('orders-list'); },
   messages:     loadMessages,
+  stats:        loadStats,
   subscription: loadSubscription,
 };
 
